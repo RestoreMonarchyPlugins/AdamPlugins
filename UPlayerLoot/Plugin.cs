@@ -17,19 +17,36 @@ namespace UPlayerLoot
     {
         public static Plugin Instance { get; private set; }
 
-        public Harmony HarmonyInstance { get; } = new Harmony("de.uplayerloot");
+        public const string HarmonyInstanceId = "de.uplayerloot";
+        private Harmony HarmonyInstance { get; set; }
 
-        public PlayerInfoSerializer InfoSerializer { get; } = new PlayerInfoSerializer();
+        public PlayerInfoSerializer InfoSerializer { get; private set; }
 
         protected override void Load()
-        {
-            Rocket.Core.Logging.Logger.Log($"{Name} {Assembly.GetName().Version} has been loaded!", ConsoleColor.Yellow);
+        {            
             Instance = this;
-            HarmonyInstance.PatchAll(Assembly); 
+            HarmonyInstance = new Harmony(HarmonyInstanceId);
+            HarmonyInstance.PatchAll(Assembly);
+            InfoSerializer = new PlayerInfoSerializer(Directory, "{0}.json");
+
             Level.onLevelLoaded += OnLevelLoaded;
             Provider.onServerShutdown += Shutdown;
             U.Events.OnPlayerDisconnected += Disconnected;
             BarricadeManager.onDamageBarricadeRequested += BarricadeDamaged;
+
+            Rocket.Core.Logging.Logger.Log($"{Name} {Assembly.GetName().Version} has been loaded!", ConsoleColor.Yellow);
+        }
+
+        protected override void Unload()
+        {            
+            Level.onLevelLoaded -= OnLevelLoaded;
+            Provider.onServerShutdown -= Shutdown;
+            U.Events.OnPlayerDisconnected -= Disconnected;
+            BarricadeManager.onDamageBarricadeRequested -= BarricadeDamaged;
+
+            HarmonyInstance.UnpatchAll(HarmonyInstanceId);
+            
+            Rocket.Core.Logging.Logger.Log($"{Name} has been unloaded!", ConsoleColor.Yellow);
         }
 
         private void Shutdown()
@@ -91,11 +108,6 @@ namespace UPlayerLoot
             InfoSerializer.Load();
         }
 
-        protected override void Unload()
-        {
-            Rocket.Core.Logging.Logger.Log($"{Name} has been unloaded!", ConsoleColor.Yellow);
-            Instance = null;
-        }
         public override TranslationList DefaultTranslations => new TranslationList()
         {
             { "DESTROYED", "Your storage container has been destroyed so you've lost your inventory!" }

@@ -25,7 +25,7 @@ namespace UBankRobbery
             if (IsDependencyLoaded("AdvancedRegions"))
             {
                 Rocket.Core.Logging.Logger.Log("Advanced regions found!");
-                //RegionManager = new UBankRobbery.Regions.AdvancedRegions.AdvancedRegionsManager();
+                RegionManager = new UBankRobbery.Regions.AdvancedRegions.AdvancedRegionsManager();
             }
             else if (IsDependencyLoaded("RocketRegions"))
             {

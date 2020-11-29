@@ -11,15 +11,15 @@ namespace UPlayerLoot.Serialization
     {
         public Vector3Wrapper(Vector3 vector3)
         {
-            this.x = vector3.x;
-            this.y = vector3.y;
-            this.z = vector3.z;
+            X = vector3.x;
+            Y = vector3.y;
+            Z = vector3.z;
         }
 
-        public float x;
-        public float y;
-        public float z;
+        public float X { get; set; }
+        public float Y { get; set; }
+        public float Z { get; set; }
 
-        public Vector3 ToVector3() => new Vector3(x, y, z);
+        public Vector3 ToVector3() => new Vector3(X, Y, Z);
     }
 }
