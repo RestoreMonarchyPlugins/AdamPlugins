@@ -37,6 +37,9 @@
     <Reference Include="AdvancedRegions-reference">
       <HintPath>..\libraries\AdvancedRegions-reference.dll</HintPath>
     </Reference>
+    <Reference Include="AdvancedZones">
+      <HintPath>..\libraries\AdvancedZones.dll</HintPath>
+    </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>..\libraries\Assembly-CSharp.dll</HintPath>
     </Reference>
@@ -82,7 +85,7 @@
     <Compile Include="Regions\AdvancedRegions\AdvancedRegionsManager.cs" />
     <Compile Include="Regions\BankRobberyRegionConfiguration.cs" />
     <Compile Include="Regions\IRegionManager.cs" />
-    <Compile Include="Regions\RocketRegions\RocketRegionsManager.cs" />
+    <Compile Include="Regions\RocketRegions\AdvancedZonesManager.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

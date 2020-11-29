@@ -20,17 +20,16 @@ namespace UBankRobbery
             Rocket.Core.Logging.Logger.Log($"{Name} {Assembly.GetName().Version} has been loaded!", ConsoleColor.Yellow);
             Instance = this;
 
-
             RobManager = new RobManager();
             if (IsDependencyLoaded("AdvancedRegions"))
             {
-                Rocket.Core.Logging.Logger.Log("Advanced regions found!");
+                Rocket.Core.Logging.Logger.Log("AdvancedRegions plugin found!");
                 RegionManager = new UBankRobbery.Regions.AdvancedRegions.AdvancedRegionsManager();
             }
-            else if (IsDependencyLoaded("RocketRegions"))
+            else if (IsDependencyLoaded("AdvancedZones"))
             {
-                Rocket.Core.Logging.Logger.Log("Rocket regions found!");
-                RegionManager = new UBankRobbery.Regions.RocketRegions.RocketRegionsManager();
+                Rocket.Core.Logging.Logger.Log("AdvancedZones plugin found!");
+                RegionManager = new UBankRobbery.Regions.RocketRegions.AdvancedZonesManager();
             }
             else
             {

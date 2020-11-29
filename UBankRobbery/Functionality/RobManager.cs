@@ -20,9 +20,7 @@ namespace UBankRobbery.Functionality
         {
             U.Events.OnPlayerDisconnected += Disconnected;
             UnturnedPlayerEvents.OnPlayerDeath += Death;
-
         }
-
 
         public ICollection<RunningRobbery> RunningRobberies { get; } = new List<RunningRobbery>();
         public IDictionary<string, DateTime> Cooldowns { get; } = new Dictionary<string, DateTime>();
@@ -76,6 +74,5 @@ namespace UBankRobbery.Functionality
                 RunningRobberies.Remove(item);
             }
         }
-
     }
 }
