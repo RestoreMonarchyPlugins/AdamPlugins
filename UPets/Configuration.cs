@@ -3,37 +3,30 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Xml.Serialization;
 using UnityEngine;
 
 namespace Adam.PetsPlugin
 {
     public class Configuration : IRocketPluginConfiguration
     {
-        public string LicenseKey;
-        public List<PetAsset> Pets = new List<PetAsset>();
-        public bool useMySQL;
-        public float maxDistanceBetweenPetAndOwner;
-        public string DatabaseAddress;
-        public string DatabaseUsername;
-        public string DatabasePassword;
-        public string DatabaseName;
-        public string DatabasePlayersTableName;
-        public string DatabasePlayersDataTableName;
-        public int DatabasePort;
+        public List<PetAsset> Pets { get; set; }
+        public bool UseMySQL { get; set; }
+        public float MaxDistanceBetweenPetAndOwner { get; set; }
+        public string DatabaseAddress { get; set; }
+        public string DatabaseUsername { get; set; }
+        public string DatabasePassword { get; set; }
+        public string DatabaseName { get; set; }
+        public string DatabasePlayersTableName { get; set; }
+        public string DatabasePlayersDataTableName { get; set; }
+        public int DatabasePort { get; set; }
 
-
-        public string Branch { get; set; } = "default";
-        public string BranchPassword { get; set; }
-
-
-        public List<PlayerD> PlayerData = new List<PlayerD>();
+        public List<PlayerD> PlayerData { get; set; }
 
         public void LoadDefaults()
         {
-            
-            LicenseKey = Guid.Empty.ToString();
-            useMySQL = false;
-            maxDistanceBetweenPetAndOwner = 50;
+            UseMySQL = false;
+            MaxDistanceBetweenPetAndOwner = 50;
             DatabaseAddress = "localhost";
             DatabaseUsername = "unturned";
             DatabasePassword = "password";
@@ -41,12 +34,15 @@ namespace Adam.PetsPlugin
             DatabasePlayersTableName = "generalPD";
             DatabasePlayersDataTableName = "listPD";
             DatabasePort = 3306;
-            Pets.Add(new PetAsset("cow", 6, 100, "cow", false, 600));
-            Pets.Add(new PetAsset("bear", 5, 250, "bear", true, 800));
-            Pets.Add(new PetAsset("wolf", 3, 150, "wolf", false, 1600));
-            Pets.Add(new PetAsset("reindeer", 7, 500, "reindeer", false, 1600));
-            Pets.Add(new PetAsset("pig", 4, 150, "pig", false, 1600));
-            Pets.Add(new PetAsset("deer", 1, 150, "deer", false, 1600));
+            Pets = new List<PetAsset>() 
+            {
+                new PetAsset("cow", 6, 100, "cow", false, 600),
+                new PetAsset("bear", 5, 250, "bear", true, 800),
+                new PetAsset("wolf", 3, 150, "wolf", false, 1600),
+                new PetAsset("reindeer", 7, 500, "reindeer", false, 1600),
+                new PetAsset("pig", 4, 150, "pig", false, 1600),
+                new PetAsset("deer", 1, 150, "deer", false, 1600)
+            };            
 
             PlayerData = new List<PlayerD>();
         }
@@ -73,7 +69,7 @@ namespace Adam.PetsPlugin
         }
         public PetAsset() { }
 
-        public bool hasPet(ulong player)
+        public bool HasPet(ulong player)
         {
             RocketPlayer p = new RocketPlayer(player.ToString());
             if (ifHasPermissionGetForFree && p.HasPermission(requiredPermission))
@@ -86,6 +82,7 @@ namespace Adam.PetsPlugin
     public class PlayerD
     {
         public ulong player;
+        [XmlArrayItem("pet")]
         public List<ushort> pets;
         public ushort lastPetUsed;
         public PlayerD(ulong player, List<ushort> pets, ushort lastPetUsed)

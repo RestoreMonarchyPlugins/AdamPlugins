@@ -25,7 +25,7 @@ namespace Adam.QueueBypasser
 
         protected override void Load()
         {
-            base.Load();
+            Rocket.Core.Logging.Logger.Log($"{Name} {Assembly.GetName().Version} has been loaded!", ConsoleColor.Yellow);
             Instance = this;
 
             Harmony = new Harmony("de.adam.queuebypasser");
@@ -38,7 +38,7 @@ namespace Adam.QueueBypasser
 
         protected override void Unload()
         {
-            base.Unload();
+            Rocket.Core.Logging.Logger.Log($"{Name} has been unloaded!", ConsoleColor.Yellow);
         }
 
         public override TranslationList DefaultTranslations => new TranslationList()

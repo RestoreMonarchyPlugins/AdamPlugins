@@ -17,7 +17,7 @@ namespace UBankRobbery
         public RobManager RobManager { get; private set; }
         protected override void Load()
         {
-            base.Load();
+            Rocket.Core.Logging.Logger.Log($"{Name} {Assembly.GetName().Version} has been loaded!", ConsoleColor.Yellow);
             Instance = this;
 
 

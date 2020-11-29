@@ -35,7 +35,7 @@ namespace UAuction
         {
             Instance = this;
             HarmonyInstance = new Harmony(HarmonyInstanceId);
-
+            Rocket.Core.Logging.Logger.Log($"{Name} {Assembly.GetName().Version} has been loaded!", ConsoleColor.Yellow);
             Level.onLevelLoaded += this.LevelLoaded;
             Provider.onServerShutdown += Shutdown;
             HarmonyInstance.PatchAll(Assembly);
@@ -44,8 +44,7 @@ namespace UAuction
         private void LevelLoaded(int level)
         {
             AwardManager.Load();
-            AuctionManager.Start(new CancellationToken())
-                .Wait();
+            AuctionManager.Start();
         }
 
         private void Shutdown()
@@ -60,7 +59,8 @@ namespace UAuction
         protected override void Unload()
         {
             HarmonyInstance.UnpatchAll(HarmonyInstanceId);
-            AuctionManager.Stop().Wait();
+            AuctionManager.Stop();
+            Rocket.Core.Logging.Logger.Log($"{Name} has been unloaded!", ConsoleColor.Yellow);
         }
 
         public override TranslationList DefaultTranslations => new TranslationList()

@@ -4,21 +4,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Timers;
 using UAuction.UI;
 using UnityEngine;
 
 namespace UAuction.Auctions
 {
     public class AuctionManager
-    {
-        public AuctionManager()
-        {
-
-        }
-        private Tuple<CancellationTokenSource, Task> cancellationToken;
-        
+    {        
         public ICollection<Auction> AuctionQueue { get; } = new List<Auction>();
 
         public RunningAuction CurrentAuction { get; private set; } = default;
@@ -26,25 +19,37 @@ namespace UAuction.Auctions
 
         public DateTime LastCompletedAuction { get; private set; } = DateTime.UtcNow;
 
-        public Task Start(CancellationToken cancellationToken)
+        public Timer Timer { get; private set; }
+
+
+        public void Start()
         {
-            var task = Task.Run(async () =>
+            Timer = new Timer(1000);
+            Timer.Elapsed += Timer_Elapsed;
+            Timer.Start();
+        }
+
+        public void Stop()
+        {
+            Timer?.Dispose();
+            Timer = null;
+
+            if (CurrentAuction != null)
             {
-                while (true)
-                {
-                    if (cancellationToken.IsCancellationRequested)
-                        return;
+                CurrentAuction.Auction.GivebackItems();
+                CurrentAuction.Auction.GivebackBids();
+            }
 
-                    TaskDispatcher.QueueOnMainThread(() =>
-                    {
-                        Tick();
-                    });
+            foreach (var auction in AuctionQueue)
+            {
+                auction.GivebackItems();
+                auction.GivebackBids();
+            }           
+        }
 
-                    await Task.Delay(TimeSpan.FromSeconds(1));
-                }
-            });
-            this.cancellationToken = new Tuple<CancellationTokenSource, Task>(CancellationTokenSource.CreateLinkedTokenSource(cancellationToken), task);
-            return Task.CompletedTask;
+        private void Timer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            TaskDispatcher.QueueOnMainThread(Tick);
         }
 
         internal void Tick()
@@ -61,14 +66,6 @@ namespace UAuction.Auctions
                     LastCompletedAuction = DateTime.UtcNow;
                 }
             }
-        }
-
-        public async Task Stop()
-        {
-            if (cancellationToken.Item2.IsCompleted)
-                return;
-            cancellationToken.Item1.Cancel();
-            await Task.WhenAll(cancellationToken.Item2);
         }
 
         private bool CheckForNewAuctionStarting()

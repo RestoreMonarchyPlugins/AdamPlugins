@@ -16,17 +16,24 @@ namespace Adam.InfoRestorer
 {
     public class InfoRestorerPlugin : RocketPlugin<InfoRestorerConfiguration>
     {
-        public const int ProductID = 138;
-        public System.Version ProductVersion = new System.Version(1, 0, 0, 2); //Keep it the same when uploading to website!
-
         public static InfoRestorerPlugin Instance { get; private set; }
         protected override void Load()
         {
             Instance = this;
-            base.Load();
+            
             UnturnedPlayerEvents.OnPlayerDeath += OnDeath;
             U.Events.OnPlayerDisconnected += OnDisconnected;
             U.Events.OnPlayerConnected += OnPlayerConnected;
+
+            Rocket.Core.Logging.Logger.Log($"{Name} {Assembly.GetName().Version} has been loaded!", ConsoleColor.Yellow);
+        }
+
+        protected override void Unload()
+        {
+            UnturnedPlayerEvents.OnPlayerDeath -= OnDeath;
+            U.Events.OnPlayerDisconnected -= OnDisconnected;
+            U.Events.OnPlayerConnected -= OnPlayerConnected;
+            Rocket.Core.Logging.Logger.Log($"{Name} has been unloaded!", ConsoleColor.Yellow);
         }
 
         private void OnPlayerConnected(UnturnedPlayer player)
@@ -50,11 +57,7 @@ namespace Adam.InfoRestorer
         public PlayerSession GetSession(UnturnedPlayer player)
             => InfoHandler.Players.Find(c => c.SteamID == player.CSteamID);
 
-        protected override void Unload()
-        {
-            base.Unload();
-            UnturnedPlayerEvents.OnPlayerDeath -= OnDeath;
-        }
+        
 
         public override TranslationList DefaultTranslations => new TranslationList()
         {

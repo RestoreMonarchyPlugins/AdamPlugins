@@ -38,8 +38,7 @@ namespace Adam.InfoRestorer.Commands
                 return;
             }
 
-            uint timesAgo = 0;
-            if(!uint.TryParse(command[1], out timesAgo) || timesAgo == 0)
+            if (!uint.TryParse(command[1], out uint timesAgo) || timesAgo == 0)
             {
                 UnturnedChat.Say(caller, InfoRestorerPlugin.Instance.Translate("not_number", command[1]), Color.red);
                 return;

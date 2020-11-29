@@ -28,7 +28,7 @@ namespace UAuction.UI
                 var bid = auction.Auction.Bids.FirstOrDefault()?.Amount ?? auction.Auction.StartingBid;
                 var timeLeft = auction.FinishDate - DateTime.UtcNow;
                 EffectManager.sendUIEffectText(Key, session.Player.channel.owner.playerID.steamID, true, "Owner", auction.Auction.Owner.CharacterName);
-                EffectManager.sendUIEffectText(Key, session.Player.channel.owner.playerID.steamID, true, "Current", $"{bid.ToString()}$");
+                EffectManager.sendUIEffectText(Key, session.Player.channel.owner.playerID.steamID, true, "Current", $"{bid}$");
                 EffectManager.sendUIEffectText(Key, session.Player.channel.owner.playerID.steamID, true, "Info", ((int)timeLeft.TotalSeconds).ToString());
             }
         }

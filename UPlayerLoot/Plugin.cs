@@ -5,6 +5,7 @@ using Rocket.Unturned;
 using Rocket.Unturned.Player;
 using SDG.Unturned;
 using Steamworks;
+using System;
 using System.Linq;
 using UnityEngine;
 using UPlayerLoot.Extensions;
@@ -22,7 +23,7 @@ namespace UPlayerLoot
 
         protected override void Load()
         {
-            base.Load();
+            Rocket.Core.Logging.Logger.Log($"{Name} {Assembly.GetName().Version} has been loaded!", ConsoleColor.Yellow);
             Instance = this;
             HarmonyInstance.PatchAll(Assembly); 
             Level.onLevelLoaded += OnLevelLoaded;
@@ -92,7 +93,7 @@ namespace UPlayerLoot
 
         protected override void Unload()
         {
-            base.Unload();
+            Rocket.Core.Logging.Logger.Log($"{Name} has been unloaded!", ConsoleColor.Yellow);
             Instance = null;
         }
         public override TranslationList DefaultTranslations => new TranslationList()
@@ -132,8 +133,6 @@ namespace UPlayerLoot
             character.SummonContainer(player.Player.clothing, Configuration.Instance.MannequinId);
 
             playerInfo.Characters.Add(character);
-
         }
-
     }
 }

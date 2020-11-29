@@ -20,7 +20,7 @@ namespace Adam.PetsPlugin
         {
             get
             {
-                if (_database == null && Plugin.Instance.Configuration.Instance.useMySQL)
+                if (_database == null && Plugin.Instance.Configuration.Instance.UseMySQL)
                     _database = new Database();
                 return _database;
             }
@@ -37,8 +37,8 @@ namespace Adam.PetsPlugin
         {
 
             Database.updateMySQLDetailsIsCorrect();
-            if (!Database.MySQLDetailsCorrect && Plugin.Instance.Configuration.Instance.useMySQL) { Rocket.Core.Logging.Logger.LogError("PetsPlugin -> MySQL details incorrect | Can't connect to database!"); return null; }
-            if (Database.MySQLDetailsCorrect && Plugin.Instance.Configuration.Instance.useMySQL) //use mysql
+            if (!Database.MySQLDetailsCorrect && Plugin.Instance.Configuration.Instance.UseMySQL) { Rocket.Core.Logging.Logger.LogError("PetsPlugin -> MySQL details incorrect | Can't connect to database!"); return null; }
+            if (Database.MySQLDetailsCorrect && Plugin.Instance.Configuration.Instance.UseMySQL) //use mysql
             {
                 return database.getPlayerData(steamId);
             }
@@ -52,9 +52,9 @@ namespace Adam.PetsPlugin
         {
             Database.updateMySQLDetailsIsCorrect();
 
-            if (!Database.MySQLDetailsCorrect && Plugin.Instance.Configuration.Instance.useMySQL) { Rocket.Core.Logging.Logger.LogError("PetsPlugin -> MySQL details incorrect | Can't connect to database!"); return false; }
+            if (!Database.MySQLDetailsCorrect && Plugin.Instance.Configuration.Instance.UseMySQL) { Rocket.Core.Logging.Logger.LogError("PetsPlugin -> MySQL details incorrect | Can't connect to database!"); return false; }
 
-            if (Database.MySQLDetailsCorrect && Plugin.Instance.Configuration.Instance.useMySQL) //use mysql
+            if (Database.MySQLDetailsCorrect && Plugin.Instance.Configuration.Instance.UseMySQL) //use mysql
             {
                 return database.setLatestPet(steamId, petId);
             }
@@ -75,9 +75,9 @@ namespace Adam.PetsPlugin
         {
             Database.updateMySQLDetailsIsCorrect();
 
-            if (!Database.MySQLDetailsCorrect && Plugin.Instance.Configuration.Instance.useMySQL) { Rocket.Core.Logging.Logger.LogError("PetsPlugin -> MySQL details incorrect | Can't connect to database!"); return false; }
+            if (!Database.MySQLDetailsCorrect && Plugin.Instance.Configuration.Instance.UseMySQL) { Rocket.Core.Logging.Logger.LogError("PetsPlugin -> MySQL details incorrect | Can't connect to database!"); return false; }
 
-            if (Database.MySQLDetailsCorrect && Plugin.Instance.Configuration.Instance.useMySQL) //use mysql
+            if (Database.MySQLDetailsCorrect && Plugin.Instance.Configuration.Instance.UseMySQL) //use mysql
             {
                 return database.addPet(steamId, petId);
             }
@@ -104,9 +104,9 @@ namespace Adam.PetsPlugin
         {
             //Database.updateMySQLDetailsIsCorrect();
 
-            if (!Database.MySQLDetailsCorrect && Plugin.Instance.Configuration.Instance.useMySQL) { Rocket.Core.Logging.Logger.LogError("PetsPlugin -> MySQL details incorrect | Can't connect to database!"); return false; }
+            if (!Database.MySQLDetailsCorrect && Plugin.Instance.Configuration.Instance.UseMySQL) { Rocket.Core.Logging.Logger.LogError("PetsPlugin -> MySQL details incorrect | Can't connect to database!"); return false; }
 
-            if (Database.MySQLDetailsCorrect && Plugin.Instance.Configuration.Instance.useMySQL) //use mysql
+            if (Database.MySQLDetailsCorrect && Plugin.Instance.Configuration.Instance.UseMySQL) //use mysql
             {
                 return database.removePet(steamId, petId);
             }
@@ -146,7 +146,7 @@ namespace Adam.PetsPlugin
 
         public static void updateMySQLDetailsIsCorrect()
         {
-            if (!Plugin.Instance.Configuration.Instance.useMySQL)
+            if (!Plugin.Instance.Configuration.Instance.UseMySQL)
                 return;
             MySqlConnection connection = null;
             try
@@ -175,7 +175,7 @@ namespace Adam.PetsPlugin
 
             Console.WriteLine(Plugin.Instance.Configuration == null);
             Console.WriteLine(Plugin.Instance.Configuration.Instance == null);
-            if (!Plugin.Instance.Configuration.Instance.useMySQL)
+            if (!Plugin.Instance.Configuration.Instance.UseMySQL)
                 return;
 
             updateMySQLDetailsIsCorrect();

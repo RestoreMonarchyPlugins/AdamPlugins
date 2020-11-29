@@ -187,7 +187,7 @@ namespace Adam.PetsPlugin
                         Where(a => a != null)
                         .OrderBy(a => a.name.Length)
                         .FirstOrDefault(a => a.name.ToLower().Contains(command[0].ToLower()) 
-                        && a.hasPet((ulong)player.CSteamID)
+                        && a.HasPet((ulong)player.CSteamID)
                         || a.name.ToLower().Contains(command[0].ToLower()) 
                         && a.ifHasPermissionGetForFree
                         && player.HasPermission(a.requiredPermission)

@@ -154,7 +154,7 @@ namespace Adam.PetsPlugin
                         ReflectionUtil.setValue("isWandering", false, item.animal);
                         ReflectionUtil.setValue("isHunting", true, item.animal);
                         */
-                        if (Vector3.Distance(item.Animal.transform.position, item.Player.transform.position) > Configuration.Instance.maxDistanceBetweenPetAndOwner)
+                        if (Vector3.Distance(item.Animal.transform.position, item.Player.transform.position) > Configuration.Instance.MaxDistanceBetweenPetAndOwner)
                         {
                             item.Animal.transform.position = item.Player.transform.position;
                         }
