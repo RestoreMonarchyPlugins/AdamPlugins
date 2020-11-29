@@ -33,7 +33,7 @@ namespace Adam.PetsPlugin
         }
 
         [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
-        public static PlayerD getPlayerD(ulong steamId)
+        public static PlayerData getPlayerD(ulong steamId)
         {
 
             Database.updateMySQLDetailsIsCorrect();
@@ -63,7 +63,7 @@ namespace Adam.PetsPlugin
                 var item = Plugin.Instance.Configuration.Instance.PlayerData.Find(c => (c.player == steamId));
                 if (item == null)
                 {
-                    Plugin.Instance.Configuration.Instance.PlayerData.Add(new PlayerD(steamId, new List<ushort>(), petId));
+                    Plugin.Instance.Configuration.Instance.PlayerData.Add(new PlayerData(steamId, new List<ushort>(), petId));
                 }
                 else item.lastPetUsed = petId;
                 Plugin.Instance.Configuration.Save();
@@ -86,7 +86,7 @@ namespace Adam.PetsPlugin
                 var item = Plugin.Instance.Configuration.Instance.PlayerData.Find(c => (c.player == steamId));
                 if (item == null)
                 {
-                    Plugin.Instance.Configuration.Instance.PlayerData.Add(new PlayerD(steamId, new List<ushort>() { petId }, 0));
+                    Plugin.Instance.Configuration.Instance.PlayerData.Add(new PlayerData(steamId, new List<ushort>() { petId }, 0));
                 }
                 else
                 {
@@ -115,7 +115,7 @@ namespace Adam.PetsPlugin
                 var item = Plugin.Instance.Configuration.Instance.PlayerData.Find(c => (c.player == steamId));
                 if (item == null)
                 {
-                    Plugin.Instance.Configuration.Instance.PlayerData.Add(new PlayerD(steamId, new List<ushort>(), 0));
+                    Plugin.Instance.Configuration.Instance.PlayerData.Add(new PlayerData(steamId, new List<ushort>(), 0));
                 }
                 else
                 {
@@ -132,7 +132,7 @@ namespace Adam.PetsPlugin
 
     public class Database
     {
-        private Dictionary<CSteamID, PlayerD> _cache = new Dictionary<CSteamID, PlayerD>();
+        private Dictionary<CSteamID, PlayerData> _cache = new Dictionary<CSteamID, PlayerData>();
 
         private static bool _MySQLDetailsCorrect = false;
 
@@ -204,7 +204,7 @@ namespace Adam.PetsPlugin
             return connection;
         }
         [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
-        public PlayerD getPlayerData(ulong playerId)
+        public PlayerData getPlayerData(ulong playerId)
         {
             if (_cache.TryGetValue((CSteamID)playerId, out var result2))
                 return result2;
@@ -235,7 +235,7 @@ namespace Adam.PetsPlugin
             {
                 Logger.LogException(ex);
             }
-            PlayerD output = new PlayerD(steamid, pets, latestPet);
+            PlayerData output = new PlayerData(steamid, pets, latestPet);
             _cache.Add((CSteamID)playerId, output);
             return output;
         }

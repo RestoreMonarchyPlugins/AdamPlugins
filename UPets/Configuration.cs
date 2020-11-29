@@ -1,4 +1,5 @@
-﻿using Rocket.API;
+﻿using Adam.PetsPlugin.Models;
+using Rocket.API;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,8 +22,6 @@ namespace Adam.PetsPlugin
         public string DatabasePlayersDataTableName { get; set; }
         public int DatabasePort { get; set; }
 
-        public List<PlayerD> PlayerData { get; set; }
-
         public void LoadDefaults()
         {
             UseMySQL = false;
@@ -42,55 +41,7 @@ namespace Adam.PetsPlugin
                 new PetAsset("reindeer", 7, 500, "reindeer", false, 1600),
                 new PetAsset("pig", 4, 150, "pig", false, 1600),
                 new PetAsset("deer", 1, 150, "deer", false, 1600)
-            };            
-
-            PlayerData = new List<PlayerD>();
+            };
         }
-    }
-
-    public class PetAsset
-    {
-        public string name;
-        public ushort id;
-        public decimal cost;
-        public string requiredPermission;
-        public bool ifHasPermissionGetForFree;
-        public double maxAliveTime;
-
-        public PetAsset(string name, ushort id, decimal cost, string requiredPermission, bool ifHasPermissionGetForFree, double maxAliveTime)
-        {
-
-            this.name = name;
-            this.id = id;
-            this.cost = cost;
-            this.requiredPermission = requiredPermission;
-            this.ifHasPermissionGetForFree = ifHasPermissionGetForFree;
-            this.maxAliveTime = maxAliveTime;
-        }
-        public PetAsset() { }
-
-        public bool HasPet(ulong player)
-        {
-            RocketPlayer p = new RocketPlayer(player.ToString());
-            if (ifHasPermissionGetForFree && p.HasPermission(requiredPermission))
-                return true;
-            if (DataHandler.getPlayerD(player) != null && DataHandler.getPlayerD(player).pets.Contains(id)) return true;
-            return false;
-        }
-    }
-
-    public class PlayerD
-    {
-        public ulong player;
-        [XmlArrayItem("pet")]
-        public List<ushort> pets;
-        public ushort lastPetUsed;
-        public PlayerD(ulong player, List<ushort> pets, ushort lastPetUsed)
-        {
-            this.player = player;
-            this.pets = pets;
-            this.lastPetUsed = lastPetUsed;
-        }
-        public PlayerD() { }
     }
 }

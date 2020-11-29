@@ -17,48 +17,15 @@ namespace Adam.PetsPlugin
 {
     public class SummonPetCommand : IRocketCommand
     {
-        public List<string> Aliases
-        {
-            get
-            {
-                return new List<string>();
-            }
-        }
+        public List<string> Aliases => new List<string>();
 
-        public string Help
-        {
-            get
-            {
-                return "Summons a pet!";
-            }
-        }
+        public string Help => "Pet management command";
 
-        public string Name
-        {
-            get
-            {
-                return "pet";
-            }
-        }
+        public string Name => "pet";
 
-        public List<string> Permissions
-        {
-            get
-            {
-                return new List<string>()
-                {
-                    "pet"
-                };
-            }
-        }
+        public List<string> Permissions => new List<string>();
 
-        public string Syntax
-        {
-            get
-            {
-                return "/pet <name>";
-            }
-        }
+        public string Syntax => "<option>";
 
         public AllowedCaller AllowedCaller => AllowedCaller.Player;
 
@@ -75,7 +42,7 @@ namespace Adam.PetsPlugin
                     trans.execute(player);
                     return;
                 }
-                PetHandler.spawnPet(player, Plugin.Instance.Configuration.Instance.Pets.Find(c => (c.id == item.lastPetUsed)));
+                PetHandler.spawnPet(player, Plugin.Instance.Configuration.Instance.Pets.Find(c => (c.Id == item.lastPetUsed)));
                 var trans2 = new Transelation(Plugin.Instance, "succesfully_spawned_pet");
                 trans2.execute(player);
                 return;
@@ -95,8 +62,8 @@ namespace Adam.PetsPlugin
                     }
 
                     var w = Plugin.Instance.Configuration.Instance.Pets.Where(a => a != null)
-                        .OrderBy(a => a.name.Length)
-                        .FirstOrDefault(a => a.name.ToLower().Contains(command[1].ToLower()));
+                        .OrderBy(a => a.Name.Length)
+                        .FirstOrDefault(a => a.Name.ToLower().Contains(command[1].ToLower()));
 
                     if (w == null)
                     {
@@ -106,7 +73,7 @@ namespace Adam.PetsPlugin
                     }
 
                     var playerItem = DataHandler.getPlayerD((ulong)player.CSteamID);
-                    if (playerItem != null && playerItem.pets.Contains(w.id) || w.ifHasPermissionGetForFree && player.HasPermission(w.requiredPermission))
+                    if (playerItem != null && playerItem.pets.Contains(w.Id) || w.IfHasPermissionGetForFree && player.HasPermission(w.RequiredPermission))
                     {
                         var trans = new Transelation(Plugin.Instance, "already_own");
                         trans.execute(player);
@@ -125,9 +92,9 @@ namespace Adam.PetsPlugin
                         return;
                     }
 
-                    if (pbal < w.cost)
+                    if (pbal < w.Cost)
                     {
-                        var trans = new Transelation(Plugin.Instance, "cant_afford", w.cost);
+                        var trans = new Transelation(Plugin.Instance, "cant_afford", w.Cost);
                         trans.execute(player);
                         return;
                     }
@@ -136,7 +103,7 @@ namespace Adam.PetsPlugin
 
                     if (Plugin.IsDependencyLoaded("Uconomy"))
                     {
-                        Uconomy.Instance.Database.IncreaseBalance(player.CSteamID.ToString(), -w.cost);
+                        Uconomy.Instance.Database.IncreaseBalance(player.CSteamID.ToString(), -w.Cost);
                     }
                     else
                     {
@@ -144,8 +111,8 @@ namespace Adam.PetsPlugin
                         return;
                     }
 
-                    DataHandler.addPetToList((ulong)player.CSteamID, w.id);
-                    var trans5 = new Transelation(Plugin.Instance, "succesfully_bought", w.name, w.cost);
+                    DataHandler.addPetToList((ulong)player.CSteamID, w.Id);
+                    var trans5 = new Transelation(Plugin.Instance, "succesfully_bought", w.Name, w.Cost);
                     trans5.execute(player);
                     break;
                 #endregion
@@ -185,12 +152,12 @@ namespace Adam.PetsPlugin
                 default:
                     var asset = Plugin.Instance.Configuration.Instance.Pets.
                         Where(a => a != null)
-                        .OrderBy(a => a.name.Length)
-                        .FirstOrDefault(a => a.name.ToLower().Contains(command[0].ToLower()) 
+                        .OrderBy(a => a.Name.Length)
+                        .FirstOrDefault(a => a.Name.ToLower().Contains(command[0].ToLower()) 
                         && a.HasPet((ulong)player.CSteamID)
-                        || a.name.ToLower().Contains(command[0].ToLower()) 
-                        && a.ifHasPermissionGetForFree
-                        && player.HasPermission(a.requiredPermission)
+                        || a.Name.ToLower().Contains(command[0].ToLower()) 
+                        && a.IfHasPermissionGetForFree
+                        && player.HasPermission(a.RequiredPermission)
                         );
 
 
@@ -203,7 +170,7 @@ namespace Adam.PetsPlugin
                     }
                     PetHandler.spawnPet(player, asset);
                     var trans2 = new Transelation(Plugin.Instance, "succesfully_spawned_pet");
-                    DataHandler.setLatestPet((ulong)player.CSteamID, asset.id);
+                    DataHandler.setLatestPet((ulong)player.CSteamID, asset.Id);
                     trans2.execute(player);
                     break;
             }
@@ -220,8 +187,8 @@ namespace Adam.PetsPlugin
 
             public infoItem(PetAsset asset)
             {
-                this.name = asset.name;
-                this.cost = asset.cost;
+                this.name = asset.Name;
+                this.cost = asset.Cost;
             }
             public infoItem() { }
 

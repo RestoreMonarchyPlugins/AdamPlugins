@@ -33,7 +33,7 @@ namespace Adam.PetsPlugin.StorageItems
             if (Animal != null)
                 DespawnAnimal();
 
-            Animal = spawnAnimal(asset.id, Player.transform.position, Player.transform.rotation);
+            Animal = spawnAnimal(asset.Id, Player.transform.position, Player.transform.rotation);
             Asset = asset;
             SummonedAt = DateTime.UtcNow;
         }

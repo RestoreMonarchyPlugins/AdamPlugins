@@ -1,8 +1,5 @@
 ﻿using Rocket.Core.Plugins;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Rocket.API.Collections;
 using SDG.Unturned;
 using UnityEngine;
@@ -11,11 +8,9 @@ using Steamworks;
 using Rocket.Unturned.Player;
 using Rocket.Unturned;
 using System.Timers;
-using Rocket.Unturned.Chat;
 using HarmonyLib;
 using Adam.PetsPlugin.Transelations;
 using Adam.PetsPlugin.Handlers;
-using System.Diagnostics;
 using UPets.Reflection;
 using System.Collections;
 
@@ -183,7 +178,6 @@ namespace Adam.PetsPlugin
             StartCoroutine(AnimalRemove(animal, index));
         }
 
-
         IEnumerator AnimalRemove(Animal animal, int index)
         {
             yield return new WaitForSeconds(1f);
@@ -226,7 +220,7 @@ namespace Adam.PetsPlugin
         {
             foreach (var item in PetHandler.PlayerPets)
             {
-                if (DateTime.Now > item.SummonedAt.AddSeconds(item.Asset.maxAliveTime))
+                if (DateTime.Now > item.SummonedAt.AddSeconds(item.Asset.MaxAliveTime))
                 {
                     var trans = new Transelation(this, "max_time_reached");
                     trans.execute(UnturnedPlayer.FromPlayer(item.Player));
@@ -245,77 +239,6 @@ namespace Adam.PetsPlugin
                 PetHandler.PlayerPets.Remove(item);
             }
         }
-
-
-
-        [HarmonyPatch(typeof(SDG.Unturned.Animal), "askDamage",  null, null, null)]
-        public class AskDamagePatch
-        {
-
-            [HarmonyPrefix()]
-            public static bool Prefix(SDG.Unturned.Animal __instance, byte amount, Vector3 newRagdoll, out EPlayerKill kill, out uint xp, bool trackKill)
-            {
-                xp = 0;
-                kill = EPlayerKill.NONE;
-                if (PetHandler.PlayerPets.Find(c => (c.Animal == __instance)) != null)
-                    return false;
-                return true;
-            }
-        }
-
-        [HarmonyPatch(typeof(SDG.Unturned.AnimalManager), "askAnimalAttack", null, null, null)]
-        public class AnimalAttackPatch
-        {
-            [HarmonyPrefix]
-            public static bool Prefix(CSteamID steamID, ushort index)
-            {
-
-                var item = PetHandler.PlayerPets.Find(c => (AnimalManager.animals.IndexOf(c.Animal) == index));
-                if (item == null)
-                    return true;
-                return false;
-            }
-        }
-
-        [HarmonyPatch(typeof(SDG.Unturned.Animal), "tick", null, null, null)]
-        public class AnimalTickPatch
-        {
-            [HarmonyPrefix()]
-            public static bool Prefix(SDG.Unturned.Animal __instance)
-            {
-                var item = PetHandler.PlayerPets.Find(c => (c.Animal == __instance));
-                if (item == null || __instance.isDead)
-                    return true;
-
-                Vector3 playerPos = item.Player.transform.position;
-                Vector3 playerDirection = item.Player.transform.forward;
-                Quaternion playerRotation = item.Player.transform.rotation;
-                float spawnDistance = 5;
-
-                Vector3 spawnPos = playerPos + (((item.Player.transform.right) + item.Player.transform.forward) * spawnDistance);
-
-                spawnPos.y = LevelGround.getHeight(spawnPos);
-
-                float delta = Time.time - (float)ReflectionUtil.getValue("lastTick", __instance);
-                ReflectionUtil.setValue("lastTick", Time.time, __instance);
-
-                ReflectionUtil.setValue("target", spawnPos, __instance);
-                ReflectionUtil.setValue("_isFleeing", true, __instance);
-                ReflectionUtil.setValue("player", null, __instance);
-                ReflectionUtil.setValue("isAttacking", false, __instance);
-                ReflectionUtil.setValue("_isFleeing", true, item.Animal);
-                ReflectionUtil.setValue("isWandering", false, item.Animal);
-                ReflectionUtil.setValue("isHunting", false, item.Animal);
-                ReflectionUtil.callMethod("move", __instance, delta);
-                return false;
-            }
-
-
-
-        }
-
     }
-
-
 }
 

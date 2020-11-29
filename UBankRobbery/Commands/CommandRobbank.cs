@@ -27,7 +27,6 @@ namespace UBankRobbery.Commands
             var player = (UnturnedPlayer)caller;
 
             var foundBank = Plugin.Instance.RegionManager.GetRegion(player.Position);
-            //var foundBank = Plugin.Instance.Configuration.Instance.Banks.SingleOrDefault(c => c.RegionId == bankName);
 
             if(foundBank == null)
             {
@@ -49,7 +48,6 @@ namespace UBankRobbery.Commands
             }
 
             Plugin.Instance.RobManager.Cooldowns.Remove(foundBank.RegionId);
-
             Plugin.Instance.RobManager.Rob(player.Player, foundBank);
         }
     }
