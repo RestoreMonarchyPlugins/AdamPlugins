@@ -10,7 +10,7 @@ namespace Adam.PetsPlugin.Handlers
 {
     public static class PetHandler
     {
-        public static Adam.PetsPlugin.Plugin PetsPlugin = Plugin.Instance;
+        public static Adam.PetsPlugin.PetsPlugin PetsPlugin = PetsPlugin.Instance;
 
 
         public static List<PlayerItem> PlayerPets { get; } = new List<PlayerItem>();

@@ -38,12 +38,12 @@ namespace Adam.PetsPlugin
                 var item = DataHandler.getPlayerD((ulong)player.CSteamID);
                 if (item == null || item.lastPetUsed == 0)
                 {
-                    var trans = new Transelation(Plugin.Instance, "no_lastpet");
+                    var trans = new Transelation(PetsPlugin.Instance, "no_lastpet");
                     trans.execute(player);
                     return;
                 }
-                PetHandler.spawnPet(player, Plugin.Instance.Configuration.Instance.Pets.Find(c => (c.Id == item.lastPetUsed)));
-                var trans2 = new Transelation(Plugin.Instance, "succesfully_spawned_pet");
+                PetHandler.spawnPet(player, PetsPlugin.Instance.Configuration.Instance.Pets.Find(c => (c.Id == item.lastPetUsed)));
+                var trans2 = new Transelation(PetsPlugin.Instance, "succesfully_spawned_pet");
                 trans2.execute(player);
                 return;
                 #endregion
@@ -56,18 +56,18 @@ namespace Adam.PetsPlugin
 
                     if (command.Length < 2)
                     {
-                        var trans = new Transelation(Plugin.Instance, "invalid_syntax");
+                        var trans = new Transelation(PetsPlugin.Instance, "invalid_syntax");
                         trans.execute(player);
                         return;
                     }
 
-                    var w = Plugin.Instance.Configuration.Instance.Pets.Where(a => a != null)
+                    var w = PetsPlugin.Instance.Configuration.Instance.Pets.Where(a => a != null)
                         .OrderBy(a => a.Name.Length)
                         .FirstOrDefault(a => a.Name.ToLower().Contains(command[1].ToLower()));
 
                     if (w == null)
                     {
-                        var trans = new Transelation(Plugin.Instance, "cant_find_global_pet", command[1]);
+                        var trans = new Transelation(PetsPlugin.Instance, "cant_find_global_pet", command[1]);
                         trans.execute(player);
                         return;
                     }
@@ -75,13 +75,13 @@ namespace Adam.PetsPlugin
                     var playerItem = DataHandler.getPlayerD((ulong)player.CSteamID);
                     if (playerItem != null && playerItem.pets.Contains(w.Id) || w.IfHasPermissionGetForFree && player.HasPermission(w.RequiredPermission))
                     {
-                        var trans = new Transelation(Plugin.Instance, "already_own");
+                        var trans = new Transelation(PetsPlugin.Instance, "already_own");
                         trans.execute(player);
                         return;
                     }
                     decimal pbal = 0;
 
-                    if (Plugin.IsDependencyLoaded("Uconomy"))
+                    if (PetsPlugin.IsDependencyLoaded("Uconomy"))
                     {
                         
                         pbal = Uconomy.Instance.Database.GetBalance(player.CSteamID.ToString());
@@ -94,14 +94,14 @@ namespace Adam.PetsPlugin
 
                     if (pbal < w.Cost)
                     {
-                        var trans = new Transelation(Plugin.Instance, "cant_afford", w.Cost);
+                        var trans = new Transelation(PetsPlugin.Instance, "cant_afford", w.Cost);
                         trans.execute(player);
                         return;
                     }
 
 
 
-                    if (Plugin.IsDependencyLoaded("Uconomy"))
+                    if (PetsPlugin.IsDependencyLoaded("Uconomy"))
                     {
                         Uconomy.Instance.Database.IncreaseBalance(player.CSteamID.ToString(), -w.Cost);
                     }
@@ -112,17 +112,17 @@ namespace Adam.PetsPlugin
                     }
 
                     DataHandler.addPetToList((ulong)player.CSteamID, w.Id);
-                    var trans5 = new Transelation(Plugin.Instance, "succesfully_bought", w.Name, w.Cost);
+                    var trans5 = new Transelation(PetsPlugin.Instance, "succesfully_bought", w.Name, w.Cost);
                     trans5.execute(player);
                     break;
                 #endregion
                 #region list
                 case "list":
-                    var pets = Plugin.Instance.Configuration.Instance.Pets.ToArray().Select(item => new infoItem(item));
+                    var pets = PetsPlugin.Instance.Configuration.Instance.Pets.ToArray().Select(item => new infoItem(item));
 
                     var print = string.Join(", ", pets.Select(item => (string)item).ToArray());
 
-                    var trans1 = new Transelation(Plugin.Instance, "all_pets", print);
+                    var trans1 = new Transelation(PetsPlugin.Instance, "all_pets", print);
                     trans1.execute(player);
                     break;
                 #endregion
@@ -131,26 +131,26 @@ namespace Adam.PetsPlugin
                     var rs = PetHandler.despawnpet(player);
                     if (rs)
                     {
-                        var trans = new Transelation(Plugin.Instance, "succesfully_despawned");
+                        var trans = new Transelation(PetsPlugin.Instance, "succesfully_despawned");
                         trans.execute(player);
                         return;
                     }
                     else
                     {
-                        var trans = new Transelation(Plugin.Instance, "using_no_pet");
+                        var trans = new Transelation(PetsPlugin.Instance, "using_no_pet");
                         trans.execute(player);
                         return;
                     }
                 #endregion
                 #region help
                 case "help":
-                    Transelation transelationHelp = new Transelation(Plugin.Instance, "help_line");
+                    Transelation transelationHelp = new Transelation(PetsPlugin.Instance, "help_line");
                     transelationHelp.execute(player);
                     return;
                 #endregion
                 #region spawnPet
                 default:
-                    var asset = Plugin.Instance.Configuration.Instance.Pets.
+                    var asset = PetsPlugin.Instance.Configuration.Instance.Pets.
                         Where(a => a != null)
                         .OrderBy(a => a.Name.Length)
                         .FirstOrDefault(a => a.Name.ToLower().Contains(command[0].ToLower()) 
@@ -164,12 +164,12 @@ namespace Adam.PetsPlugin
 
                     if (asset == null)
                     {
-                        var trans = new Transelation(Plugin.Instance, "cant_find_pet", command[0]);
+                        var trans = new Transelation(PetsPlugin.Instance, "cant_find_pet", command[0]);
                         trans.execute(player);
                         return;
                     }
                     PetHandler.spawnPet(player, asset);
-                    var trans2 = new Transelation(Plugin.Instance, "succesfully_spawned_pet");
+                    var trans2 = new Transelation(PetsPlugin.Instance, "succesfully_spawned_pet");
                     DataHandler.setLatestPet((ulong)player.CSteamID, asset.Id);
                     trans2.execute(player);
                     break;

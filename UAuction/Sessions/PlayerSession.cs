@@ -144,8 +144,5 @@ namespace UAuction.Sessions
                 auctionParameter = null;
             }
         }
-
-
-
     }
 }

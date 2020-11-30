@@ -9,9 +9,9 @@ using UnityEngine;
 
 namespace Adam.PetsPlugin
 {
-    public class Configuration : IRocketPluginConfiguration
+    public class PetsConfiguration : IRocketPluginConfiguration
     {
-        public List<PetAsset> Pets { get; set; }
+        public List<PetConfig> Pets { get; set; }
         public bool UseMySQL { get; set; }
         public float MaxDistanceBetweenPetAndOwner { get; set; }
         public string DatabaseAddress { get; set; }
@@ -30,17 +30,17 @@ namespace Adam.PetsPlugin
             DatabaseUsername = "unturned";
             DatabasePassword = "password";
             DatabaseName = "unturned";
-            DatabasePlayersTableName = "generalPD";
-            DatabasePlayersDataTableName = "listPD";
+            DatabasePlayersTableName = "Players";
+            DatabasePlayersDataTableName = "PlayersData";
             DatabasePort = 3306;
-            Pets = new List<PetAsset>() 
+            Pets = new List<PetConfig>() 
             {
-                new PetAsset("cow", 6, 100, "cow", false, 600),
-                new PetAsset("bear", 5, 250, "bear", true, 800),
-                new PetAsset("wolf", 3, 150, "wolf", false, 1600),
-                new PetAsset("reindeer", 7, 500, "reindeer", false, 1600),
-                new PetAsset("pig", 4, 150, "pig", false, 1600),
-                new PetAsset("deer", 1, 150, "deer", false, 1600)
+                new PetConfig("cow", 6, 100, "cow", 600),
+                new PetConfig("bear", 5, 250, "bear", 800),
+                new PetConfig("wolf", 3, 150, "wolf", 1600),
+                new PetConfig("reindeer", 7, 500, "reindeer", 1600),
+                new PetConfig("pig", 4, 150, "pig", 1600),
+                new PetConfig("deer", 1, 150, "deer", 1600)
             };
         }
     }

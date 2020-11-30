@@ -4,7 +4,6 @@ using Rocket.API.Collections;
 using SDG.Unturned;
 using UnityEngine;
 using System.Reflection;
-using Steamworks;
 using Rocket.Unturned.Player;
 using Rocket.Unturned;
 using System.Timers;
@@ -13,88 +12,80 @@ using Adam.PetsPlugin.Transelations;
 using Adam.PetsPlugin.Handlers;
 using UPets.Reflection;
 using System.Collections;
+using Adam.PetsPlugin.Providers;
 
 namespace Adam.PetsPlugin
 {
-    public class Plugin : RocketPlugin<Configuration>
+    public class PetsPlugin : RocketPlugin<PetsConfiguration>
     {
-        public static Plugin Instance;
-        private System.Timers.Timer timer;
-        public Harmony Harmony { get; } = new Harmony("de.petsplugin");
+        public static PetsPlugin Instance { get; private set; }
+        
+        private Timer Timer { get; set; }
+
+        public const string HarmonyInstanceId = "de.petsplugin";
+        private Harmony HarmonyInstance { get; set; }
+
+        public IPetsDatabaseProvider Database { get; private set; }
+
         private DateTime _check = DateTime.Now;
 
+        private FieldInfo animalManagerField;
+        public AnimalManager AInstance => animalManagerField.GetValue(null) as AnimalManager;       
 
-        public const int ProductID = 123;
-        public System.Version ProductVersion  = new System.Version(1, 1, 23);
-
-
-        public bool IsLoaded { get; private set; }
-
-        public AnimalManager AInstance
+        public override TranslationList DefaultTranslations => new TranslationList()
         {
-            get
-            {
-                return (AnimalManager)typeof(AnimalManager).GetField("manager", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.IgnoreCase | BindingFlags.Static).GetValue(null);
-            }
-        }
-       
-
-        public override TranslationList DefaultTranslations
-        {
-            get
-            {
-                return new TranslationList()
-                {
-                    {  "no_lastpet", "Couden't manage to find your last used pet! Type (/pet help) for help! Color=red" },
-                    {  "cant_find_pet", "Coudn't manage to find a pet you own called {0} Color=red" },
-                    {  "max_time_reached", "Your pet has died respawn it again by /pet! Color=yellow" },
-                    {  "succesfully_spawned_pet", "You succesfully spawned your pet in! Color=yellow" },
-                    {  "all_pets", "All the available pets are: {0} Color=yellow" },
-                    {  "invalid_syntax", "/buy <pet> Color=red" },
-                    {  "cant_find_global_pet",  "Couden't manage to find a pet called {0} Color=red"},
-                    {  "cant_afford", "You can't afford to buy this pet for {0}. Color=red" },
-                    {  "succesfully_bought", "You have succefully bought a {0} for {1}! Color=yellow" },
-                    {  "already_own", "You already own this pet! COlor=red" },
-                    {  "succesfully_despawned", "You have succesfully despawned your pet! Color=yellow" },
-                    {  "using_no_pet", "You do not have a pet equipped at this moment! Color=yellow" },
-                    {  "succesfully_disabled_ui", "You have succesfully disabled the pets UI Information! Color=yellow" },
-                    {  "succesfully_enabled_ui", "You have succesfully enabled the pets UI Information! Color=yellow" },
-                    {  "help_line", "/pet buy <name> | /pet list | /pet toggleui | /pet despawn | /pet <name> | /pet (spawns the most recent pet) Color=yellow" }
-                };
-            }
-        }
+            {  "no_lastpet", "Couden't manage to find your last used pet! Type (/pet help) for help! Color=red" },
+            {  "cant_find_pet", "Coudn't manage to find a pet you own called {0} Color=red" },
+            {  "max_time_reached", "Your pet has died respawn it again by /pet! Color=yellow" },
+            {  "succesfully_spawned_pet", "You succesfully spawned your pet in! Color=yellow" },
+            {  "all_pets", "All the available pets are: {0} Color=yellow" },
+            {  "invalid_syntax", "/buy <pet> Color=red" },
+            {  "cant_find_global_pet",  "Couden't manage to find a pet called {0} Color=red"},
+            {  "cant_afford", "You can't afford to buy this pet for {0}. Color=red" },
+            {  "succesfully_bought", "You have succefully bought a {0} for {1}! Color=yellow" },
+            {  "already_own", "You already own this pet! COlor=red" },
+            {  "succesfully_despawned", "You have succesfully despawned your pet! Color=yellow" },
+            {  "using_no_pet", "You do not have a pet equipped at this moment! Color=yellow" },
+            {  "succesfully_disabled_ui", "You have succesfully disabled the pets UI Information! Color=yellow" },
+            {  "succesfully_enabled_ui", "You have succesfully enabled the pets UI Information! Color=yellow" },
+            {  "help_line", "/pet buy <name> | /pet list | /pet toggleui | /pet despawn | /pet <name> | /pet (spawns the most recent pet) Color=yellow" }
+        };
 
         protected override void Load()
         {
             Instance = this;
-            U.Events.OnPlayerDisconnected += onDisconnected_Event;
-            Level.onLevelLoaded += onLoaded_Event;
-            Provider.onServerShutdown += onServerShutdown;
-            var original10 = typeof(AnimalManager).GetMethod("askAnimalAttack");
-            var prefix10 = typeof(AnimalAttackPatch).GetMethod("Prefix");
-            Harmony.Patch(original10, new HarmonyMethod(prefix10), null, null);
+            animalManagerField = typeof(AnimalManager).GetField("manager", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.IgnoreCase | BindingFlags.Static);
 
-            var original = typeof(Animal).GetMethod("askDamage");
-            var prefix = typeof(AskDamagePatch).GetMethod("Prefix");
-            Harmony.Patch(original, new HarmonyMethod(prefix), null, null);
+            HarmonyInstance = new Harmony(HarmonyInstanceId);
+            HarmonyInstance.PatchAll(Assembly);
 
+            Database = new JsonPetsDatabaseProvider();
+            Database.Reload();
 
-            var original2 = typeof(Animal).GetMethod("tick");
-            var prefix2 = typeof(AnimalTickPatch).GetMethod("Prefix");
-            Harmony.Patch(original2, new HarmonyMethod(prefix2), null, null);
-            U.Events.OnPlayerConnected += onConnected;
-
-            IsLoaded = true;
-
+            U.Events.OnPlayerDisconnected += OnDisconnected;
+            Level.onLevelLoaded += OnLevelLoaded;
+            Provider.onServerShutdown += OnServerShutdown;
+            U.Events.OnPlayerConnected += OnConnected;
         }
 
+        protected override void Unload()
+        {
+            Instance = null;
 
-        private void onConnected(UnturnedPlayer player)
+            HarmonyInstance.UnpatchAll(HarmonyInstanceId);
+
+            U.Events.OnPlayerDisconnected -= OnDisconnected;
+            Level.onLevelLoaded -= OnLevelLoaded;
+            Provider.onServerShutdown -= OnServerShutdown;
+            U.Events.OnPlayerConnected -= OnConnected;
+        }
+
+        private void OnConnected(UnturnedPlayer player)
         {
 
         }
 
-        private void onServerShutdown()
+        private void OnServerShutdown()
         {
             foreach (var item in PetHandler.PlayerPets)
             {
@@ -102,29 +93,13 @@ namespace Adam.PetsPlugin
             }
         }
 
-        protected override void Unload()
-        {
-            if (!IsLoaded)
-            {
-                return;
-            }
-
-            Instance = null;
-            U.Events.OnPlayerDisconnected -= onDisconnected_Event;
-            Level.onLevelLoaded -= onLoaded_Event;
-            Provider.onServerShutdown -= onServerShutdown;
-            U.Events.OnPlayerConnected -= onConnected;
-            IsLoaded = false;
-
-        }
-
-
         public void FixedUpdate()
         {
             if (!IsLoaded)
                 return;
 
             //I know this is supposed to be where I show my skills but I can't bother patching every single movment method to force it to only move to me so I'll just do a spam thingy.
+            // yeah, me too
             if (!Level.isLoaded)
                 return;    
 
@@ -207,12 +182,12 @@ namespace Adam.PetsPlugin
             animal.transform.position = pos;
         }
 
-        private void onLoaded_Event(int level)
+        private void OnLevelLoaded(int level)
         {
-            timer = new System.Timers.Timer();
-            timer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
-            timer.Interval = 200;
-            timer.Enabled = true;
+            Timer = new System.Timers.Timer();
+            Timer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
+            Timer.Interval = 200;
+            Timer.Enabled = true;
         }
 
 
@@ -230,7 +205,7 @@ namespace Adam.PetsPlugin
             return;
         }
         
-        private void onDisconnected_Event(UnturnedPlayer player)
+        private void OnDisconnected(UnturnedPlayer player)
         {
             var item = PetHandler.PlayerPets.Find(c => (c.Player == player.Player));
             if (item != null)

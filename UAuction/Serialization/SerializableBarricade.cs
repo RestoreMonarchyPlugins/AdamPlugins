@@ -52,6 +52,4 @@ namespace UAuction.Serialization
             }
         }
     }
-
-    
 }

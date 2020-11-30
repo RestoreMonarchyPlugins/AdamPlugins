@@ -102,24 +102,29 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\PetCommand.cs" />
-    <Compile Include="Configuration.cs" />
+    <Compile Include="PetsConfiguration.cs" />
     <Compile Include="Handlers\DataHandler.cs" />
     <Compile Include="Handlers\PetHandler.cs" />
-    <Compile Include="Models\PetAsset.cs" />
-    <Compile Include="Models\PlayerData.cs" />
+    <Compile Include="Models\PetConfig.cs" />
+    <Compile Include="Models\PlayerPet.cs" />
     <Compile Include="Patches\AnimalManagerPatches.cs" />
     <Compile Include="Patches\AnimalPatches.cs" />
-    <Compile Include="Plugin.cs" />
+    <Compile Include="PetsPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Extensions\ReflectionUtil.cs" />
-    <Compile Include="Providers\IPetDatabaseProvider.cs" />
+    <Compile Include="Providers\IPetsDatabaseProvider.cs" />
+    <Compile Include="Providers\JsonPetsDatabaseProvider.cs" />
     <Compile Include="StorageItems\PlayerItem.cs" />
+    <Compile Include="Storage\DataStorage.cs" />
     <Compile Include="Transelations\ColorExtras.cs" />
     <Compile Include="Transelations\Transelation.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Services\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

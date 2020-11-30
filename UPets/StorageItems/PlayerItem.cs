@@ -42,14 +42,14 @@ namespace Adam.PetsPlugin.StorageItems
         {
             if (Animal == null)
                 return false;
-            Plugin.Instance.sendAnimalRemove(Animal);
+            PetsPlugin.Instance.sendAnimalRemove(Animal);
             Animal = null;
             return true;
         }
 
         private Animal addAnimal(ushort id, Vector3 point, float angle)
         {
-            return (Animal)typeof(AnimalManager).GetMethod("addAnimal", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(Plugin.Instance.AInstance, new object[]
+            return (Animal)typeof(AnimalManager).GetMethod("addAnimal", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(PetsPlugin.Instance.AInstance, new object[]
             {
                 id,
                 point,
@@ -65,9 +65,9 @@ namespace Adam.PetsPlugin.StorageItems
             PackInfo packInfo = new PackInfo();
             animal1.pack = packInfo;
             packInfo.animals.Add(animal1);
-            Plugin.Instance.AInstance.channel.openWrite();
-            Plugin.Instance.AInstance.sendAnimal(animal1);
-            Plugin.Instance.AInstance.channel.closeWrite("tellAnimal", ESteamCall.OTHERS, ESteamPacket.UPDATE_RELIABLE_CHUNK_BUFFER);
+            PetsPlugin.Instance.AInstance.channel.openWrite();
+            PetsPlugin.Instance.AInstance.sendAnimal(animal1);
+            PetsPlugin.Instance.AInstance.channel.closeWrite("tellAnimal", ESteamCall.OTHERS, ESteamPacket.UPDATE_RELIABLE_CHUNK_BUFFER);
             AnimalManager.sendAnimalAlive(animal1, point, (byte)angle.y);
             return animal1;
         }
