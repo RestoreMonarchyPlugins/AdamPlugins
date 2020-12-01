@@ -102,6 +102,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\PetCommand.cs" />
+    <Compile Include="Components\PetComponent.cs" />
+    <Compile Include="Helpers\AnimalsHelper.cs" />
     <Compile Include="PetsConfiguration.cs" />
     <Compile Include="Handlers\DataHandler.cs" />
     <Compile Include="Handlers\PetHandler.cs" />
@@ -114,6 +116,8 @@
     <Compile Include="Extensions\ReflectionUtil.cs" />
     <Compile Include="Providers\IPetsDatabaseProvider.cs" />
     <Compile Include="Providers\JsonPetsDatabaseProvider.cs" />
+    <Compile Include="Services\PetsMovementService.cs" />
+    <Compile Include="Services\PetsService.cs" />
     <Compile Include="StorageItems\PlayerItem.cs" />
     <Compile Include="Storage\DataStorage.cs" />
     <Compile Include="Transelations\ColorExtras.cs" />
@@ -123,9 +127,7 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Services\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

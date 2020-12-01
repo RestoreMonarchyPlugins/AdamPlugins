@@ -11,7 +11,7 @@ namespace Adam.PetsPlugin
 {
     public class PetsConfiguration : IRocketPluginConfiguration
     {
-        public List<PetConfig> Pets { get; set; }
+        public string MessageColor { get; set; }
         public bool UseMySQL { get; set; }
         public float MaxDistanceBetweenPetAndOwner { get; set; }
         public string DatabaseAddress { get; set; }
@@ -21,9 +21,11 @@ namespace Adam.PetsPlugin
         public string DatabasePlayersTableName { get; set; }
         public string DatabasePlayersDataTableName { get; set; }
         public int DatabasePort { get; set; }
+        public List<PetConfig> Pets { get; set; }
 
         public void LoadDefaults()
         {
+            MessageColor = "#FF00FF";
             UseMySQL = false;
             MaxDistanceBetweenPetAndOwner = 50;
             DatabaseAddress = "localhost";

@@ -12,11 +12,82 @@ using UnityEngine;
 using fr34kyn01535.Uconomy;
 using Adam.PetsPlugin.Transelations;
 using Adam.PetsPlugin.Handlers;
+using Adam.PetsPlugin.Models;
 
 namespace Adam.PetsPlugin
 {
     public class SummonPetCommand : IRocketCommand
     {
+        private PetsPlugin pluginInstance => PetsPlugin.Instance;
+
+        public void Execute(IRocketPlayer caller, string[] command)
+        {
+            if (command.Length < 1)
+            {
+                HelpCommand(caller);
+                return;
+            }
+
+            switch (command[0].ToLower())
+            {
+                case "list":
+                    ListCommand(caller);
+                    break;
+                case "shop":
+                    ShopCommand(caller);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void ShopCommand(IRocketPlayer caller)
+        {
+            StringBuilder sb = new StringBuilder(pluginInstance.Translate("PetShopAvailable"));
+            foreach (var petConfig in pluginInstance.Configuration.Instance.Pets)
+            {
+                if (!string.IsNullOrEmpty(petConfig.RequiredPermission) &&  !caller.HasPermission(petConfig.RequiredPermission))
+                {
+                    continue;
+                }
+                sb.Append($" {petConfig.Name}[{petConfig.Cost}],");
+            }
+
+            if (sb.Length < 2)
+                UnturnedChat.Say(caller, pluginInstance.Translate("PetShopNone"), pluginInstance.MessageColor);
+            else
+                UnturnedChat.Say(caller, pluginInstance.Translate("PetShopAvailable", sb.ToString().TrimEnd(',')), pluginInstance.MessageColor);
+        }
+
+        private void ListCommand(IRocketPlayer caller)
+        {
+            PetConfig petConfig;
+            List<string> pets = new List<string>();
+            foreach (var pet in pluginInstance.Database.GetPlayerPets(caller.Id))
+            {
+                petConfig = pluginInstance.Configuration.Instance.Pets.FirstOrDefault(x => x.Id == pet.Id);
+                if (petConfig != null)
+                {
+                    pets.Add(petConfig.Name);
+                }                
+            }
+
+            if (pets.Count == 0)
+                UnturnedChat.Say(caller, pluginInstance.Translate("PetListNone"), pluginInstance.MessageColor);
+            else
+                UnturnedChat.Say(caller, pluginInstance.Translate("PetList", string.Join(", ", pets)), pluginInstance.MessageColor);
+            
+        }
+
+        private void HelpCommand(IRocketPlayer caller)
+        {
+            UnturnedChat.Say(caller, pluginInstance.Translate("HelpLine1"), pluginInstance.MessageColor);
+            UnturnedChat.Say(caller, pluginInstance.Translate("HelpLine2"), pluginInstance.MessageColor);
+            UnturnedChat.Say(caller, pluginInstance.Translate("HelpLine3"), pluginInstance.MessageColor);
+            UnturnedChat.Say(caller, pluginInstance.Translate("HelpLine4"), pluginInstance.MessageColor);
+        }
+
+
         public List<string> Aliases => new List<string>();
 
         public string Help => "Pet management command";
@@ -28,180 +99,5 @@ namespace Adam.PetsPlugin
         public string Syntax => "<option>";
 
         public AllowedCaller AllowedCaller => AllowedCaller.Player;
-
-        public void Execute(IRocketPlayer caller, string[] command)
-        {
-            UnturnedPlayer player = (UnturnedPlayer)caller;
-            if(command.Length == 0)
-            {
-                #region noLastPet
-                var item = DataHandler.getPlayerD((ulong)player.CSteamID);
-                if (item == null || item.lastPetUsed == 0)
-                {
-                    var trans = new Transelation(PetsPlugin.Instance, "no_lastpet");
-                    trans.execute(player);
-                    return;
-                }
-                PetHandler.spawnPet(player, PetsPlugin.Instance.Configuration.Instance.Pets.Find(c => (c.Id == item.lastPetUsed)));
-                var trans2 = new Transelation(PetsPlugin.Instance, "succesfully_spawned_pet");
-                trans2.execute(player);
-                return;
-                #endregion
-            }
-
-            switch (command[0].ToLower())
-            {
-                #region buy
-                case "buy":
-
-                    if (command.Length < 2)
-                    {
-                        var trans = new Transelation(PetsPlugin.Instance, "invalid_syntax");
-                        trans.execute(player);
-                        return;
-                    }
-
-                    var w = PetsPlugin.Instance.Configuration.Instance.Pets.Where(a => a != null)
-                        .OrderBy(a => a.Name.Length)
-                        .FirstOrDefault(a => a.Name.ToLower().Contains(command[1].ToLower()));
-
-                    if (w == null)
-                    {
-                        var trans = new Transelation(PetsPlugin.Instance, "cant_find_global_pet", command[1]);
-                        trans.execute(player);
-                        return;
-                    }
-
-                    var playerItem = DataHandler.getPlayerD((ulong)player.CSteamID);
-                    if (playerItem != null && playerItem.pets.Contains(w.Id) || w.IfHasPermissionGetForFree && player.HasPermission(w.RequiredPermission))
-                    {
-                        var trans = new Transelation(PetsPlugin.Instance, "already_own");
-                        trans.execute(player);
-                        return;
-                    }
-                    decimal pbal = 0;
-
-                    if (PetsPlugin.IsDependencyLoaded("Uconomy"))
-                    {
-                        
-                        pbal = Uconomy.Instance.Database.GetBalance(player.CSteamID.ToString());
-                    }
-                    else
-                    {
-                        Rocket.Core.Logging.Logger.LogWarning("Error - No economy plugin found! Please install Uconomy or AviEconomy!");
-                        return;
-                    }
-
-                    if (pbal < w.Cost)
-                    {
-                        var trans = new Transelation(PetsPlugin.Instance, "cant_afford", w.Cost);
-                        trans.execute(player);
-                        return;
-                    }
-
-
-
-                    if (PetsPlugin.IsDependencyLoaded("Uconomy"))
-                    {
-                        Uconomy.Instance.Database.IncreaseBalance(player.CSteamID.ToString(), -w.Cost);
-                    }
-                    else
-                    {
-                        Rocket.Core.Logging.Logger.LogWarning("Error - No economy plugin found! Please install Uconomy or AviEconomy!");
-                        return;
-                    }
-
-                    DataHandler.addPetToList((ulong)player.CSteamID, w.Id);
-                    var trans5 = new Transelation(PetsPlugin.Instance, "succesfully_bought", w.Name, w.Cost);
-                    trans5.execute(player);
-                    break;
-                #endregion
-                #region list
-                case "list":
-                    var pets = PetsPlugin.Instance.Configuration.Instance.Pets.ToArray().Select(item => new infoItem(item));
-
-                    var print = string.Join(", ", pets.Select(item => (string)item).ToArray());
-
-                    var trans1 = new Transelation(PetsPlugin.Instance, "all_pets", print);
-                    trans1.execute(player);
-                    break;
-                #endregion
-                #region despawn
-                case "despawn":
-                    var rs = PetHandler.despawnpet(player);
-                    if (rs)
-                    {
-                        var trans = new Transelation(PetsPlugin.Instance, "succesfully_despawned");
-                        trans.execute(player);
-                        return;
-                    }
-                    else
-                    {
-                        var trans = new Transelation(PetsPlugin.Instance, "using_no_pet");
-                        trans.execute(player);
-                        return;
-                    }
-                #endregion
-                #region help
-                case "help":
-                    Transelation transelationHelp = new Transelation(PetsPlugin.Instance, "help_line");
-                    transelationHelp.execute(player);
-                    return;
-                #endregion
-                #region spawnPet
-                default:
-                    var asset = PetsPlugin.Instance.Configuration.Instance.Pets.
-                        Where(a => a != null)
-                        .OrderBy(a => a.Name.Length)
-                        .FirstOrDefault(a => a.Name.ToLower().Contains(command[0].ToLower()) 
-                        && a.HasPet((ulong)player.CSteamID)
-                        || a.Name.ToLower().Contains(command[0].ToLower()) 
-                        && a.IfHasPermissionGetForFree
-                        && player.HasPermission(a.RequiredPermission)
-                        );
-
-
-
-                    if (asset == null)
-                    {
-                        var trans = new Transelation(PetsPlugin.Instance, "cant_find_pet", command[0]);
-                        trans.execute(player);
-                        return;
-                    }
-                    PetHandler.spawnPet(player, asset);
-                    var trans2 = new Transelation(PetsPlugin.Instance, "succesfully_spawned_pet");
-                    DataHandler.setLatestPet((ulong)player.CSteamID, asset.Id);
-                    trans2.execute(player);
-                    break;
-            }
-                #endregion
-            
-
-
-        }
-
-        public class infoItem
-        {
-            public string name;
-            public decimal cost;
-
-            public infoItem(PetAsset asset)
-            {
-                this.name = asset.Name;
-                this.cost = asset.Cost;
-            }
-            public infoItem() { }
-
-            public static explicit operator string(infoItem item)
-            {
-
-                return item.name + " | " + item.cost;
-            }
-
-            public override string ToString()
-            {
-                return name + " | " + cost;
-            }
-        }
     }
 }

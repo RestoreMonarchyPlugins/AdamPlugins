@@ -17,10 +17,7 @@ namespace Adam.PetsPlugin.Patches
         [HarmonyPrefix]
         public static bool Prefix(CSteamID steamID, ushort index)
         {
-            var item = PetHandler.PlayerPets.Find(c => (AnimalManager.animals.IndexOf(c.Animal) == index));
-            if (item == null)
-                return true;
-            return false;
+            return !PetsPlugin.Instance.PetsService.IsPet(AnimalManager.animals[index]);
         }
     }
 }
