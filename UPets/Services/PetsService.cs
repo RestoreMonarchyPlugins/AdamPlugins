@@ -1,5 +1,6 @@
 ﻿using Adam.PetsPlugin.Helpers;
 using Adam.PetsPlugin.Models;
+using Rocket.Unturned;
 using Rocket.Unturned.Player;
 using SDG.Unturned;
 using System;
@@ -24,12 +25,20 @@ namespace Adam.PetsPlugin.Services
 
         void Start()
         {
-
+            U.Events.OnPlayerDisconnected += OnPlayerDisconnected;
         }
 
         void OnDestroy()
         {
+            U.Events.OnPlayerDisconnected -= OnPlayerDisconnected;
+        }
 
+        private void OnPlayerDisconnected(UnturnedPlayer player)
+        {
+            foreach (var pet in GetPlayerActivePets(player.Id))
+            {
+                KillPet(pet);
+            }
         }
 
         public bool TrySpawnPet(UnturnedPlayer player, ushort petId)
@@ -54,14 +63,14 @@ namespace Adam.PetsPlugin.Services
             ActivePets.Add(pet);
         }
 
-        private void KillPet(PlayerPet pet)
+        public void KillPet(PlayerPet pet)
         {
             AnimalsHelper.KillAnimal(pet.Animal);
             ActivePets.Remove(pet);
         }
 
         public bool IsPet(Animal animal) => ActivePets.Exists(x => x.Animal == animal);
-        public PlayerPet GetPet(Animal animal) => ActivePets.FirstOrDefault(x => x.Animal = animal);
+        public PlayerPet GetPet(Animal animal) => ActivePets.FirstOrDefault(x => x.Animal == animal);
         public IEnumerable<PlayerPet> GetPlayerActivePets(string playerId) => ActivePets.Where(x => x.PlayerId == playerId);
     }
 }

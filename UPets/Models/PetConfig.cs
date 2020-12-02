@@ -1,27 +1,24 @@
-﻿using Rocket.API;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Xml.Serialization;
 
 namespace Adam.PetsPlugin.Models
 {
     public class PetConfig
     {
-        public string Name { get; set; }
+        [XmlAttribute]
         public ushort Id { get; set; }
+        [XmlAttribute]
+        public string Name { get; set; }        
+        [XmlAttribute]
         public decimal Cost { get; set; }
-        public string RequiredPermission { get; set; }
-        public double MaxAliveTime { get; set; }
+        [XmlAttribute]
+        public string Permission { get; set; }
 
-        public PetConfig(string name, ushort id, decimal cost, string requiredPermission, double maxAliveTime)
-        {
-            Name = name;
+        public PetConfig(ushort id, string name, decimal cost, string permission)
+        {            
             Id = id;
+            Name = name;
             Cost = cost;
-            RequiredPermission = requiredPermission;
-            MaxAliveTime = maxAliveTime;
+            Permission = permission;
         }
 
         public PetConfig() { }

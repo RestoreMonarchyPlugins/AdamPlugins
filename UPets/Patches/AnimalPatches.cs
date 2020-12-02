@@ -1,11 +1,5 @@
-﻿using Adam.PetsPlugin.Handlers;
-using HarmonyLib;
+﻿using HarmonyLib;
 using SDG.Unturned;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UPets.Reflection;
 
@@ -23,11 +17,8 @@ namespace Adam.PetsPlugin.Patches
                 return true;
 
             Vector3 playerPos = pet.Player.transform.position;
-            Vector3 playerDirection = pet.Player.transform.forward;
-            Quaternion playerRotation = pet.Player.transform.rotation;
-            float spawnDistance = 5;
 
-            Vector3 spawnPos = playerPos + (((pet.Player.transform.right) + pet.Player.transform.forward) * spawnDistance);
+            Vector3 spawnPos = playerPos + ((pet.Player.transform.right + pet.Player.transform.forward) * PetsPlugin.Instance.Configuration.Instance.MinDistance);
 
             spawnPos.y = LevelGround.getHeight(spawnPos);
 

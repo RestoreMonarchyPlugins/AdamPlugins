@@ -43,6 +43,9 @@
     <Reference Include="Assembly-CSharp-firstpass">
       <HintPath>..\libraries\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
+    <Reference Include="Dapper, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dapper.2.0.78\lib\net461\Dapper.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="MySql.Data, Version=8.0.17.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
       <HintPath>..\packages\MySql.Data.8.0.17\lib\net452\MySql.Data.dll</HintPath>
@@ -102,11 +105,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\PetCommand.cs" />
-    <Compile Include="Components\PetComponent.cs" />
     <Compile Include="Helpers\AnimalsHelper.cs" />
+    <Compile Include="Helpers\UconomyHelper.cs" />
     <Compile Include="PetsConfiguration.cs" />
-    <Compile Include="Handlers\DataHandler.cs" />
-    <Compile Include="Handlers\PetHandler.cs" />
     <Compile Include="Models\PetConfig.cs" />
     <Compile Include="Models\PlayerPet.cs" />
     <Compile Include="Patches\AnimalManagerPatches.cs" />
@@ -116,12 +117,10 @@
     <Compile Include="Extensions\ReflectionUtil.cs" />
     <Compile Include="Providers\IPetsDatabaseProvider.cs" />
     <Compile Include="Providers\JsonPetsDatabaseProvider.cs" />
+    <Compile Include="Providers\MySQLPetsDatabaseProvider.cs" />
     <Compile Include="Services\PetsMovementService.cs" />
     <Compile Include="Services\PetsService.cs" />
-    <Compile Include="StorageItems\PlayerItem.cs" />
     <Compile Include="Storage\DataStorage.cs" />
-    <Compile Include="Transelations\ColorExtras.cs" />
-    <Compile Include="Transelations\Transelation.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

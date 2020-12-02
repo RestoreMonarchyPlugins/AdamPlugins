@@ -1,13 +1,7 @@
-﻿using Adam.PetsPlugin.Handlers;
-using Rocket.Unturned;
-using Rocket.Unturned.Events;
+﻿using Rocket.Unturned.Events;
 using Rocket.Unturned.Player;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
+using UPets.Reflection;
 
 namespace Adam.PetsPlugin.Services
 {
@@ -32,16 +26,18 @@ namespace Adam.PetsPlugin.Services
 
         private void FollowPlayer(UnturnedPlayer player, Vector3 position)
         {
+            var pets = pluginInstance.PetsService.GetPlayerActivePets(player.Id);
 
-            for (int i = 0; i < PetHandler.PlayerPets.Count; i++)
+            foreach (var pet in pets)
             {
-                var item = PetHandler.PlayerPets[i];
-                if (item.Animal == null)
-                    continue;
+                ReflectionUtil.setValue("_isFleeing", true, pet.Animal);
+                ReflectionUtil.setValue("isWandering", false, pet.Animal);
+                ReflectionUtil.setValue("isHunting", false, pet.Animal);
+                ReflectionUtil.callMethod("updateTicking", pet.Animal);
 
-                if (item.Player != null)
+                if (Vector3.Distance(pet.Animal.transform.position, pet.Player.transform.position) > pluginInstance.Configuration.Instance.MaxDistance)
                 {
-                    
+                    pet.Animal.transform.position = pet.Player.transform.position;
                 }
             }
         }

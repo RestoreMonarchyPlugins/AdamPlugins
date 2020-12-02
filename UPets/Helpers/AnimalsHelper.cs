@@ -32,8 +32,7 @@ namespace Adam.PetsPlugin.Helpers
 
         public static void KillAnimal(Animal animal)
         {
-            DeadAnimal((ushort)AnimalManager.animals.IndexOf(animal), animal.transform.position);
-            AnimalManager.tickingAnimals.Remove(animal);
+            AnimalManager.sendAnimalDead(animal, Vector3.zero);
         }
 
         private static Animal AddAnimal(ushort animalId, Vector3 point, float angle)
@@ -44,16 +43,6 @@ namespace Adam.PetsPlugin.Helpers
                 point,
                 angle,
                 false
-            });
-        }
-
-        private static void DeadAnimal(ushort index, Vector3 position)
-        {
-            pluginInstance.AnimalManager.channel.send("tellAnimalDead", ESteamCall.OTHERS, ESteamPacket.UPDATE_RELIABLE_BUFFER, new object[]
-            {
-                index,
-                position,
-                (byte)ERagdollEffect.NONE
             });
         }
     }

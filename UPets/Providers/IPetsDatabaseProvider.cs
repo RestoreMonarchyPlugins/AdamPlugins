@@ -10,7 +10,6 @@ namespace Adam.PetsPlugin.Providers
     public interface IPetsDatabaseProvider
     {
         void AddPlayerPet(PlayerPet playerPet);
-        void DeletePlayerPet(int id);
         IEnumerable<PlayerPet> GetPlayerPets(string playerId);
         void Reload();
     }

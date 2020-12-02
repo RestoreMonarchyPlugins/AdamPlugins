@@ -1,10 +1,7 @@
 ﻿using Adam.PetsPlugin.Models;
 using Adam.PetsPlugin.Storage;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Adam.PetsPlugin.Providers
 {
@@ -33,12 +30,7 @@ namespace Adam.PetsPlugin.Providers
         {
             playerPet.Id = GetIDForPet();
             playersPets.Add(playerPet);
-        }
-
-        public void DeletePlayerPet(int id)
-        {
-            if (playersPets.RemoveAll(x => x.Id == id) > 0)
-                DataStorage.Save(playersPets);
+            DataStorage.Save(playersPets);
         }
 
         public IEnumerable<PlayerPet> GetPlayerPets(string playerId)

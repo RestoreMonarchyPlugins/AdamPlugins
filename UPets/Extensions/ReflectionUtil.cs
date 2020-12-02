@@ -9,7 +9,6 @@ namespace UPets.Reflection
 {
     public static class ReflectionUtil
     {
-
         public static object getValue<Class>(string name, Class class1)
         {
 
