@@ -6,6 +6,11 @@ using HarmonyLib;
 using Adam.PetsPlugin.Providers;
 using Adam.PetsPlugin.Services;
 using Rocket.Unturned.Chat;
+using Rocket.Core.Logging;
+using System;
+using Rocket.API;
+using System.Threading;
+using Rocket.Core.Utils;
 
 namespace Adam.PetsPlugin
 {
@@ -35,11 +40,17 @@ namespace Adam.PetsPlugin
             HarmonyInstance = new Harmony(HarmonyInstanceId);
             HarmonyInstance.PatchAll(Assembly);
 
-            Database = new JsonPetsDatabaseProvider();
+            if (Configuration.Instance.UseMySQL)
+                Database = new MySQLPetsDatabaseProvider();
+            else
+                Database = new JsonPetsDatabaseProvider();
+
             Database.Reload();
 
             PetsService = gameObject.AddComponent<PetsService>();
             PetsMovementService = gameObject.AddComponent<PetsMovementService>();
+
+            Logger.Log($"{Name} {Assembly.GetName().Version} has been loaded!", ConsoleColor.Yellow);
         }
 
         protected override void Unload()
@@ -50,6 +61,21 @@ namespace Adam.PetsPlugin
 
             Destroy(PetsService);
             Destroy(PetsMovementService);
+
+            Logger.Log($"{Name} has been unloaded!", ConsoleColor.Yellow);
+        }
+
+        public void ReplyPlayer(IRocketPlayer player, string translationsKey, params object[] args)
+        {
+            if (!ThreadUtil.IsGameThread(Thread.CurrentThread))
+                TaskDispatcher.QueueOnMainThread(Send);
+            else
+                Send();
+            
+            void Send()
+            {
+                UnturnedChat.Say(player, Translate(translationsKey, args), MessageColor);
+            }
         }
 
         public override TranslationList DefaultTranslations => new TranslationList()

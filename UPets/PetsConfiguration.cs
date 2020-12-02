@@ -40,10 +40,10 @@ namespace Adam.PetsPlugin
             {
                 new PetConfig(6, "cow", 100, ""),
                 new PetConfig(5, "bear", 250, ""),
-                new PetConfig(3, "wolf", 150, "wolf"),
-                new PetConfig(7, "reindeer", 500, "reindeer"),
-                new PetConfig(4, "pig", 150, "pig"),
-                new PetConfig(1, "deer", 150, "deer")
+                new PetConfig(3, "wolf", 150, "pet.wolf"),
+                new PetConfig(7, "reindeer", 500, "pet.reindeer"),
+                new PetConfig(4, "pig", 150, "pet.pig"),
+                new PetConfig(1, "deer", 150, "pet.deer")
             };
         }
     }

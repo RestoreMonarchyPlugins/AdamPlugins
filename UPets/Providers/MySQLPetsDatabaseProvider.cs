@@ -39,6 +39,7 @@ namespace Adam.PetsPlugin.Providers
         {
             const string sql = "CREATE TABLE IF NOT EXISTS PlayersPetsTable (AnimalId SMALLINT UNSIGNED NOT NULL, PlayerId CHAR(17) NOT NULL, " +
                 "PurchaseDate DATETIME NOT NULL, CONSTRAINT PK_PlayersPetsTable PRIMARY KEY(AnimalId, PlayerId));";
+            connection.Execute(Query(sql));
         }
     }
 }

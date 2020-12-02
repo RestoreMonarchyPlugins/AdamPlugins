@@ -1,5 +1,6 @@
 ﻿using Adam.PetsPlugin.Helpers;
 using Adam.PetsPlugin.Models;
+using Rocket.Core.Utils;
 using Rocket.Unturned;
 using Rocket.Unturned.Player;
 using SDG.Unturned;
@@ -40,23 +41,8 @@ namespace Adam.PetsPlugin.Services
                 KillPet(pet);
             }
         }
-
-        public bool TrySpawnPet(UnturnedPlayer player, ushort petId)
-        {
-            var ownedPets = pluginInstance.Database.GetPlayerPets(player.Id);
-
-            var pet = ownedPets.FirstOrDefault(x => x.AnimalId == petId);
-            if (pet == null)
-            {
-                return false;
-            } else
-            {
-                SpawnPet(player, pet);
-                return true;
-            }
-        }
         
-        private void SpawnPet(UnturnedPlayer player, PlayerPet pet)
+        public void SpawnPet(UnturnedPlayer player, PlayerPet pet)
         {
             pet.Animal = AnimalsHelper.SpawnAnimal(pet.AnimalId, player.Position, (byte)player.Rotation);
             pet.Player = player.Player;

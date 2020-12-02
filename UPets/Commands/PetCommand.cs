@@ -7,6 +7,8 @@ using Rocket.Unturned.Player;
 using Rocket.Unturned.Chat;
 using Adam.PetsPlugin.Models;
 using Adam.PetsPlugin.Helpers;
+using System.Threading;
+using Rocket.Core.Utils;
 
 namespace Adam.PetsPlugin
 {
@@ -25,21 +27,28 @@ namespace Adam.PetsPlugin
             string option = command[0].ToLower();
             if (option == "list")
             {
-                ListCommand(caller);
-            } else if (option == "shop")
+                ThreadPool.QueueUserWorkItem((_) => ListCommand(caller));
+            }
+            else if (option == "shop")
             {
                 ShopCommand(caller);
-            } else if (option == "buy")
+            }
+            else if (option == "help")
+            {
+                HelpCommand(caller);
+            }
+            else if (option == "buy")
             {
                 if (TryGetPetConfig(caller, command.ElementAtOrDefault(1), out PetConfig config))
                 {
-                    BuyCommand((UnturnedPlayer)caller, config);
+                    ThreadPool.QueueUserWorkItem((_) => BuyCommand((UnturnedPlayer)caller, config));
                 }
-            } else
+            }
+            else
             {
                 if (TryGetPetConfig(caller, command[0], out PetConfig config))
                 {
-                    SpawnCommand((UnturnedPlayer)caller, config);
+                    ThreadPool.QueueUserWorkItem((_) => SpawnCommand((UnturnedPlayer)caller, config));
                 }
             }
         }
@@ -49,15 +58,15 @@ namespace Adam.PetsPlugin
             config = null;
             if (value == null)
             {
-                UnturnedChat.Say(caller, pluginInstance.Translate("PetNameRequired"), pluginInstance.MessageColor);
+                pluginInstance.ReplyPlayer(caller, "PetNameRequired", value);
                 return false;
             }
 
             config = pluginInstance.Configuration.Instance.Pets.FirstOrDefault(x => x.Name.Equals(value, StringComparison.OrdinalIgnoreCase));
             if (config == null)
             {
-                UnturnedChat.Say(caller, pluginInstance.Translate("PetNotFound", value), pluginInstance.MessageColor);
-                return false;
+                pluginInstance.ReplyPlayer(caller, "PetNotFound", value);
+                return false;   
             }
             return true;
         }
@@ -65,38 +74,40 @@ namespace Adam.PetsPlugin
         public void SpawnCommand(UnturnedPlayer player, PetConfig config)
         {
             var pets = pluginInstance.PetsService.GetPlayerActivePets(player.Id);
+            PlayerPet pet;
             if (pets != null && pets.Count() > 0)
             {
-                var pet = pets.First();
-                pluginInstance.PetsService.KillPet(pet);
+                pet = pets.First();
+                TaskDispatcher.QueueOnMainThread(() => pluginInstance.PetsService.KillPet(pet));
 
                 if (pet.AnimalId == config.Id)
                 {
-                    UnturnedChat.Say(player, pluginInstance.Translate("PetDespawnSuccess", config.Name), pluginInstance.MessageColor);
+                    pluginInstance.ReplyPlayer(player, "PetDespawnSuccess", config.Name);
                     return;
                 }
             }
 
-            if (pluginInstance.PetsService.TrySpawnPet(player, config.Id))
+            pet = pluginInstance.Database.GetPlayerPets(player.Id).FirstOrDefault(x => x.AnimalId == config.Id);
+            if (pet != null)
             {
-                UnturnedChat.Say(player, pluginInstance.Translate("PetSpawnSuccess", config.Name), pluginInstance.MessageColor);
-            } else
-            {
-                UnturnedChat.Say(player, pluginInstance.Translate("PetSpawnFail", config.Name), pluginInstance.MessageColor);
+                TaskDispatcher.QueueOnMainThread(() => pluginInstance.PetsService.SpawnPet(player, pet));
+                pluginInstance.ReplyPlayer(player, "PetSpawnSuccess", config.Name);
             }
+            else
+                pluginInstance.ReplyPlayer(player, "PetSpawnFail", config.Name);
         }
 
         public void BuyCommand(UnturnedPlayer player, PetConfig config)
         {
             if (pluginInstance.Database.GetPlayerPets(player.Id).Any(x => x.AnimalId == config.Id))
             {
-                UnturnedChat.Say(player, pluginInstance.Translate("PetBuyAlreadyHave"), pluginInstance.MessageColor);
+                pluginInstance.ReplyPlayer(player, "PetBuyAlreadyHave", config.Name);
                 return;
             }
 
             if (UconomyHelper.GetPlayerBalance(player.Id) < config.Cost)
             {
-                UnturnedChat.Say(player, pluginInstance.Translate("PetCantAfford", config.Name, config.Cost), pluginInstance.MessageColor);
+                pluginInstance.ReplyPlayer(player, "PetCantAfford", config.Name, config.Cost);
                 return;
             }
 
@@ -107,12 +118,12 @@ namespace Adam.PetsPlugin
                 PlayerId = player.Id,
                 PurchaseDate = DateTime.UtcNow
             });
-            UnturnedChat.Say(player, pluginInstance.Translate("PetBuySuccess", config.Name, config.Cost), pluginInstance.MessageColor);
+            pluginInstance.ReplyPlayer(player, "PetBuySuccess", config.Name, config.Cost);
         }
 
         private void ShopCommand(IRocketPlayer caller)
         {
-            StringBuilder sb = new StringBuilder(pluginInstance.Translate("PetShopAvailable"));
+            StringBuilder sb = new StringBuilder("PetShopAvailable");
             foreach (var petConfig in pluginInstance.Configuration.Instance.Pets)
             {
                 if (string.IsNullOrEmpty(petConfig.Permission) || caller.IsAdmin || caller.HasPermission(petConfig.Permission))
@@ -122,9 +133,9 @@ namespace Adam.PetsPlugin
             }
 
             if (sb.Length < 2)
-                UnturnedChat.Say(caller, pluginInstance.Translate("PetShopNone"), pluginInstance.MessageColor);
+                pluginInstance.ReplyPlayer(caller, "PetShopNone");
             else
-                UnturnedChat.Say(caller, sb.ToString().TrimEnd(','), pluginInstance.MessageColor);
+                pluginInstance.ReplyPlayer(caller, sb.ToString().TrimEnd(','));
         }
 
         private void ListCommand(IRocketPlayer caller)
@@ -141,18 +152,18 @@ namespace Adam.PetsPlugin
             }
 
             if (pets.Count == 0)
-                UnturnedChat.Say(caller, pluginInstance.Translate("PetListNone"), pluginInstance.MessageColor);
+                pluginInstance.ReplyPlayer(caller, "PetListNone");
             else
-                UnturnedChat.Say(caller, pluginInstance.Translate("PetList", string.Join(", ", pets)), pluginInstance.MessageColor);
+                pluginInstance.ReplyPlayer(caller, "PetList", string.Join(", ", pets));
             
         }
 
         private void HelpCommand(IRocketPlayer caller)
         {
-            UnturnedChat.Say(caller, pluginInstance.Translate("PetHelpLine1"), pluginInstance.MessageColor);
-            UnturnedChat.Say(caller, pluginInstance.Translate("PetHelpLine2"), pluginInstance.MessageColor);
-            UnturnedChat.Say(caller, pluginInstance.Translate("PetHelpLine3"), pluginInstance.MessageColor);
-            UnturnedChat.Say(caller, pluginInstance.Translate("PetHelpLine4"), pluginInstance.MessageColor);
+            pluginInstance.ReplyPlayer(caller, "PetHelpLine1");
+            pluginInstance.ReplyPlayer(caller, "PetHelpLine2");
+            pluginInstance.ReplyPlayer(caller, "PetHelpLine3");
+            pluginInstance.ReplyPlayer(caller, "PetHelpLine4");
         }
 
 
