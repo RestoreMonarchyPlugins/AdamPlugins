@@ -16,8 +16,7 @@ namespace UBankRobbery
         public UBankRobbery.Regions.IRegionManager RegionManager { get; private set; }
         public RobManager RobManager { get; private set; }
         protected override void Load()
-        {
-            Rocket.Core.Logging.Logger.Log($"{Name} {Assembly.GetName().Version} has been loaded!", ConsoleColor.Yellow);
+        {            
             Instance = this;
 
             RobManager = new RobManager();
@@ -36,7 +35,15 @@ namespace UBankRobbery
                 Rocket.Core.Logging.Logger.LogError("No regions plugin was found!");
                 UnloadPlugin();
             }
+
+            Rocket.Core.Logging.Logger.Log($"{Name} {Assembly.GetName().Version} has been loaded!", ConsoleColor.Yellow);
         }
+
+        protected override void Unload()
+        {
+            Rocket.Core.Logging.Logger.Log($"{Name} has been unloaded!", ConsoleColor.Yellow);
+        }
+
         public override TranslationList DefaultTranslations => new TranslationList()
         {
             {

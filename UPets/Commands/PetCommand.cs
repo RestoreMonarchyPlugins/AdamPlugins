@@ -99,6 +99,12 @@ namespace Adam.PetsPlugin
 
         public void BuyCommand(UnturnedPlayer player, PetConfig config)
         {
+            if (!player.HasPermission(config.Permission) && !player.IsAdmin && !string.IsNullOrEmpty(config.Permission))
+            {
+                pluginInstance.ReplyPlayer(player, "PetBuyNoPermission", config.Name);
+                return;
+            }
+
             if (pluginInstance.Database.GetPlayerPets(player.Id).Any(x => x.AnimalId == config.Id))
             {
                 pluginInstance.ReplyPlayer(player, "PetBuyAlreadyHave", config.Name);

@@ -62,6 +62,7 @@ namespace Adam.PetsPlugin
             Destroy(PetsService);
             Destroy(PetsMovementService);
 
+            Logger.Log($"Made by AdamAdam, maintained by Restore Monarchy Plugins", ConsoleColor.Yellow);
             Logger.Log($"{Name} has been unloaded!", ConsoleColor.Yellow);
         }
 
@@ -95,7 +96,8 @@ namespace Adam.PetsPlugin
             { "PetDespawnSuccess", "Successfully despawned your {0}!" },
             { "PetCantAfford", "You can't afford to buy {0} for ${1}" },
             { "PetBuySuccess", "You successfully bought {0} for ${1}!" },
-            { "PetBuyAlreadyHave", "You already have {0}!" }
+            { "PetBuyAlreadyHave", "You already have {0}!" },
+            { "PetBuyNoPermission", "You don't have permission to buy {0}!" }
         };
     }
 }

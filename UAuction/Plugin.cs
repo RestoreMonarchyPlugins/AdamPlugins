@@ -34,11 +34,20 @@ namespace UAuction
         protected override void Load()
         {
             Instance = this;
-            HarmonyInstance = new Harmony(HarmonyInstanceId);
-            Rocket.Core.Logging.Logger.Log($"{Name} {Assembly.GetName().Version} has been loaded!", ConsoleColor.Yellow);
+            HarmonyInstance = new Harmony(HarmonyInstanceId);            
             Level.onLevelLoaded += this.LevelLoaded;
             Provider.onServerShutdown += Shutdown;
             HarmonyInstance.PatchAll(Assembly);
+
+            Rocket.Core.Logging.Logger.Log($"Made by AdamAdam, maintained by Restore Monarchy Plugins", ConsoleColor.Yellow);
+            Rocket.Core.Logging.Logger.Log($"{Name} {Assembly.GetName().Version} has been loaded!", ConsoleColor.Yellow);
+        }
+
+        protected override void Unload()
+        {
+            HarmonyInstance.UnpatchAll(HarmonyInstanceId);
+            AuctionManager.Stop();
+            Rocket.Core.Logging.Logger.Log($"{Name} has been unloaded!", ConsoleColor.Yellow);
         }
 
         private void LevelLoaded(int level)
@@ -54,13 +63,6 @@ namespace UAuction
             {
                 auction.Dispose();
             }
-        }
-
-        protected override void Unload()
-        {
-            HarmonyInstance.UnpatchAll(HarmonyInstanceId);
-            AuctionManager.Stop();
-            Rocket.Core.Logging.Logger.Log($"{Name} has been unloaded!", ConsoleColor.Yellow);
         }
 
         public override TranslationList DefaultTranslations => new TranslationList()

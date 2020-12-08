@@ -43,7 +43,7 @@ namespace UBankRobbery.Commands
             var cooldown = Plugin.Instance.RobManager.Cooldowns.SingleOrDefault(c => c.Key == foundBank.RegionId);
             if(DateTime.UtcNow < cooldown.Value)
             {
-                UnturnedChat.Say(caller, Plugin.Instance.Translate("on_cooldown", (int)(DateTime.UtcNow - cooldown.Value).TotalSeconds), Color.red);
+                UnturnedChat.Say(caller, Plugin.Instance.Translate("on_cooldown", (int)(cooldown.Value - DateTime.UtcNow).TotalSeconds), Color.red);
                 return;
             }
 

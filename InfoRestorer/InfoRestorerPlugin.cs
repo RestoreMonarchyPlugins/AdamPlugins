@@ -25,6 +25,7 @@ namespace Adam.InfoRestorer
             U.Events.OnPlayerDisconnected += OnDisconnected;
             U.Events.OnPlayerConnected += OnPlayerConnected;
 
+            Rocket.Core.Logging.Logger.Log($"Made by AdamAdam, maintained by Restore Monarchy Plugins", ConsoleColor.Yellow);
             Rocket.Core.Logging.Logger.Log($"{Name} {Assembly.GetName().Version} has been loaded!", ConsoleColor.Yellow);
         }
 
@@ -55,9 +56,7 @@ namespace Adam.InfoRestorer
         }
 
         public PlayerSession GetSession(UnturnedPlayer player)
-            => InfoHandler.Players.Find(c => c.SteamID == player.CSteamID);
-
-        
+            => InfoHandler.Players.Find(c => c.SteamID == player.CSteamID);        
 
         public override TranslationList DefaultTranslations => new TranslationList()
         {
