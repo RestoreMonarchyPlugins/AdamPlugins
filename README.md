@@ -6,7 +6,8 @@ Join Restore Monarchy [Discord](https://discord.gg/Z3BWae5) if you need help
 Download lastest version of each plugin from [Releases](https://github.com/RestoreMonarchyPlugins/AdamPlugins/releases)
 
 
-### Restore Monarchy fixes and improvements  
+### Restore Monarchy fixes and improvements
+*UPlayerLoot, QueueBypasser and SentryCommander weren't fixed because I didn't find them too useful, but their source codes are included*  
 **[UAuction](UAuction.md) 3.0**
 * Added MinimumTimeAfterBid to config. When there's a new bid and the auction time is under MinimumTimeAfterBid, it is set to MinimumTimeAfterBid
 * Fixed plugin not return auction items and bids if server shutdown or crash
