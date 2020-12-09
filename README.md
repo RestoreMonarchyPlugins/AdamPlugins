@@ -1,5 +1,5 @@
 ## Adam Plugins
-This repository contains AdamAdam Unturned plugins he was selling on ImperialPlugins.com but discontinued them.  
+This repository contains [AdamAdam](https://github.com/Edsparr) Unturned plugins he was selling on ImperialPlugins.com but discontinued them.  
 Some of them were fixed and improved by Restore Monarchy.
 
 Join Restore Monarchy [Discord](https://discord.gg/Z3BWae5) if you need help  
