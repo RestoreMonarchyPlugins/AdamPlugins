@@ -1,4 +1,4 @@
-### Adam Plugins
+## Adam Plugins
 This repository contains AdamAdam Unturned plugins he was selling on ImperialPlugins.com but discontinued them.  
 Some of them were fixed and improved by Restore Monarchy.
 
