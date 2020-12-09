@@ -8,6 +8,7 @@ Download lastest version of each plugin from [Releases](https://github.com/Resto
 
 ### Restore Monarchy fixes and improvements
 *UPlayerLoot, QueueBypasser and SentryCommander weren't fixed because I didn't find them too useful, but their source codes are included*  
+
 **[UAuction](UAuction.md) 3.0**
 * Added MinimumTimeAfterBid to config. When there's a new bid and the auction time is under MinimumTimeAfterBid, it is set to MinimumTimeAfterBid
 * Fixed plugin not return auction items and bids if server shutdown or crash
