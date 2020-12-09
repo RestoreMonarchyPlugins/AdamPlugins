@@ -36,7 +36,7 @@ namespace Adam.PetsPlugin.Services
 
         private void OnPlayerDisconnected(UnturnedPlayer player)
         {
-            foreach (var pet in GetPlayerActivePets(player.Id))
+            foreach (var pet in GetPlayerActivePets(player.Id).ToArray())
             {
                 KillPet(pet);
             }

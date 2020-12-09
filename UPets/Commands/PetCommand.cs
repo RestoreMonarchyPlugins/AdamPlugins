@@ -9,6 +9,7 @@ using Adam.PetsPlugin.Models;
 using Adam.PetsPlugin.Helpers;
 using System.Threading;
 using Rocket.Core.Utils;
+using Rocket.Core.Logging;
 
 namespace Adam.PetsPlugin
 {
@@ -27,7 +28,7 @@ namespace Adam.PetsPlugin
             string option = command[0].ToLower();
             if (option == "list")
             {
-                ThreadPool.QueueUserWorkItem((_) => ListCommand(caller));
+                RunAsync(() => ListCommand(caller));
             }
             else if (option == "shop")
             {
@@ -41,16 +42,30 @@ namespace Adam.PetsPlugin
             {
                 if (TryGetPetConfig(caller, command.ElementAtOrDefault(1), out PetConfig config))
                 {
-                    ThreadPool.QueueUserWorkItem((_) => BuyCommand((UnturnedPlayer)caller, config));
+                    RunAsync(() => BuyCommand((UnturnedPlayer)caller, config));
                 }
             }
             else
             {
                 if (TryGetPetConfig(caller, command[0], out PetConfig config))
                 {
-                    ThreadPool.QueueUserWorkItem((_) => SpawnCommand((UnturnedPlayer)caller, config));
+                    SpawnCommand((UnturnedPlayer)caller, config);
                 }
             }
+        }
+
+        private void RunAsync(Action action)
+        {
+            ThreadPool.QueueUserWorkItem((_) => 
+            { 
+                try
+                {
+                    action.Invoke();
+                } catch (Exception e)
+                {
+                    TaskDispatcher.QueueOnMainThread(() => Logger.LogException(e, $"YA'LL WANNA SINGLE SAY"));
+                }
+            });
         }
 
         private bool TryGetPetConfig(IRocketPlayer caller, string value, out PetConfig config)
@@ -78,7 +93,8 @@ namespace Adam.PetsPlugin
             if (pets != null && pets.Count() > 0)
             {
                 pet = pets.First();
-                TaskDispatcher.QueueOnMainThread(() => pluginInstance.PetsService.KillPet(pet));
+
+                pluginInstance.PetsService.KillPet(pet);
 
                 if (pet.AnimalId == config.Id)
                 {
@@ -87,14 +103,17 @@ namespace Adam.PetsPlugin
                 }
             }
 
-            pet = pluginInstance.Database.GetPlayerPets(player.Id).FirstOrDefault(x => x.AnimalId == config.Id);
-            if (pet != null)
+            RunAsync(() => 
             {
-                TaskDispatcher.QueueOnMainThread(() => pluginInstance.PetsService.SpawnPet(player, pet));
-                pluginInstance.ReplyPlayer(player, "PetSpawnSuccess", config.Name);
-            }
-            else
-                pluginInstance.ReplyPlayer(player, "PetSpawnFail", config.Name);
+                pet = pluginInstance.Database.GetPlayerPets(player.Id).FirstOrDefault(x => x.AnimalId == config.Id);
+                if (pet != null)
+                {
+                    TaskDispatcher.QueueOnMainThread(() => pluginInstance.PetsService.SpawnPet(player, pet));
+                    pluginInstance.ReplyPlayer(player, "PetSpawnSuccess", config.Name);
+                }
+                else
+                    pluginInstance.ReplyPlayer(player, "PetSpawnFail", config.Name);
+            });            
         }
 
         public void BuyCommand(UnturnedPlayer player, PetConfig config)
