@@ -18,8 +18,8 @@ namespace Adam.PetsPlugin.Services
     {
         private PetsPlugin pluginInstance => PetsPlugin.Instance;
         
-        public event AnimalSpawned OnAnimalSpawned;
-        public event AnimalDespawned OnAnimalDespawned;
+        public event PetSpawned OnPetSpawned;
+        public event PetDespawned OnPetDespawned;
         
         public List<PlayerPet> ActivePets { get; private set; }
 
@@ -62,14 +62,14 @@ namespace Adam.PetsPlugin.Services
             pet.Animal = AnimalsHelper.SpawnAnimal(pet.AnimalId, player.Position, (byte)player.Rotation);
             pet.Player = player.Player;
             ActivePets.Add(pet);
-            OnAnimalSpawned.TryInvoke(pet);
+            OnPetSpawned.TryInvoke(pet);
         }
 
         public void KillPet(PlayerPet pet)
         {
             AnimalsHelper.KillAnimal(pet.Animal);
             ActivePets.Remove(pet);
-            OnAnimalDespawned.TryInvoke(pet);
+            OnPetDespawned.TryInvoke(pet);
         }
 
         public bool IsPet(Animal animal) => ActivePets.Exists(x => x.Animal == animal);
@@ -77,6 +77,6 @@ namespace Adam.PetsPlugin.Services
         public IEnumerable<PlayerPet> GetPlayerActivePets(string playerId) => ActivePets.Where(x => x.PlayerId == playerId);
     }
 
-    public delegate void AnimalSpawned(PlayerPet pet);
-    public delegate void AnimalDespawned(PlayerPet pet);
+    public delegate void PetSpawned(PlayerPet pet);
+    public delegate void PetDespawned(PlayerPet pet);
 }
