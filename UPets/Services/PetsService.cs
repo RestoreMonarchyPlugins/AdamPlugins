@@ -38,7 +38,7 @@ namespace Adam.PetsPlugin.Services
             U.Events.OnPlayerDisconnected -= OnPlayerDisconnected;
             
             //we want to also kill all pets on shutdown
-            foreach (var pet in ActivePets)
+            foreach (var pet in ActivePets.ToArray())
             {
                 KillPet(pet);
             }
