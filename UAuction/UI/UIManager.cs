@@ -5,15 +5,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace UAuction.UI
 {
-    public class UIManager
+    public class UIManager : MonoBehaviour
     {
         private const short Key = 7458;
-        public UIManager()
+        
+        void Start()
         {
-
+            InvokeRepeating("RefreshUiText", 1, 1);
         }
 
         public void RefreshUiText()

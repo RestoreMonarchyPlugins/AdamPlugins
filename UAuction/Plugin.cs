@@ -24,20 +24,20 @@ namespace UAuction
         public AuctionManager AuctionManager { get; } = new AuctionManager();
         public AwardManager AwardManager { get; } = new AwardManager();
         public SessionManager SessionManager { get; } = new SessionManager();
-        public UIManager UIManager { get; set; } = new UIManager();
+        public UIManager UIManager { get; private set; }
 
         public const string HarmonyInstanceId = "de.uauction";
         private Harmony HarmonyInstance { get; set; }
-
-        private DateTime lastCall = DateTime.MinValue;
 
         protected override void Load()
         {
             Instance = this;
             HarmonyInstance = new Harmony(HarmonyInstanceId);            
-            Level.onLevelLoaded += this.LevelLoaded;
+            Level.onLevelLoaded += LevelLoaded;
             Provider.onServerShutdown += Shutdown;
             HarmonyInstance.PatchAll(Assembly);
+
+            UIManager = gameObject.AddComponent<UIManager>();
 
             Rocket.Core.Logging.Logger.Log($"Made by AdamAdam, maintained by Restore Monarchy Plugins", ConsoleColor.Yellow);
             Rocket.Core.Logging.Logger.Log($"{Name} {Assembly.GetName().Version} has been loaded!", ConsoleColor.Yellow);
@@ -45,6 +45,7 @@ namespace UAuction
 
         protected override void Unload()
         {
+            Destroy(UIManager);
             HarmonyInstance.UnpatchAll(HarmonyInstanceId);
             AuctionManager.Stop();
             Rocket.Core.Logging.Logger.Log($"{Name} has been unloaded!", ConsoleColor.Yellow);
@@ -128,15 +129,6 @@ namespace UAuction
                 false,
                 text
             });
-        }
-
-        public void FixedUpdate()
-        {
-            if ((DateTime.UtcNow - lastCall) > TimeSpan.FromSeconds(1))
-            {
-                UIManager?.RefreshUiText();
-                lastCall = DateTime.UtcNow;
-            }
         }
     }
 }

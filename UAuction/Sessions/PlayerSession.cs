@@ -17,10 +17,8 @@ namespace UAuction.Sessions
         private const ushort PlantIdUsing = 35345;
         public PlayerSession(Player player)
         {
-            this.Player = player;
+            Player = player;
         }
-
-
 
         private Items startAuctionItems;
         private Auction auctionParameter;
@@ -71,7 +69,6 @@ namespace UAuction.Sessions
         {
             var asset = (VehicleAsset)Assets.find(EAssetType.VEHICLE, auction.AuctionItem.Vehicle.VehicleId);
             Plugin.Say(UnturnedPlayer.FromPlayer(Player), "AUCTION_INFO_VEHICLE", Color.green, asset.vehicleName, asset.id);
-            var vehicle = auction.AuctionItem.Vehicle;
         }
 
         private void OpenItemPreview(Auction auction)
@@ -82,7 +79,6 @@ namespace UAuction.Sessions
             {
                 var position = item.Position.Value;
                 newInventory.addItem(position.X, position.Y, position.Rot, item.ToItem());
-
             }
 
             Player.inventory.items[PlayerInventory.STORAGE] = new Items(PlayerInventory.STORAGE);
@@ -113,11 +109,8 @@ namespace UAuction.Sessions
             if (gesture != EPlayerGesture.INVENTORY_STOP)
                 return;
 
-
-
             if(auctionParameter != null)
-                FinalizeAuctionCreation();
-            
+                FinalizeAuctionCreation();            
         }
 
         public void FinalizeAuctionCreation()

@@ -45,13 +45,13 @@ namespace UAuction.Commands
 
             
             decimal pay = auction.Auction.GetBidPrice(player.Player, amount);
-            if(Uconomy.Instance.Database.GetBalance(player.Id)  < pay)
+            if(Uconomy.Instance.Database.GetBalance(player.Id) < pay)
             {
                 Plugin.Say(player, "CANT_AFFORD", Color.red, pay);
                 return;
             }
             //Check balance
-            if(!auction.Auction.IsValidBid(amount, out decimal currentBid) || !auction.Auction.AddBid(player.Player, amount))
+            if(!auction.Auction.AddBid(player.Player, amount, out decimal currentBid))
             {
                 Plugin.Say(player, "UNDER_BID", Color.red, currentBid);
                 return;

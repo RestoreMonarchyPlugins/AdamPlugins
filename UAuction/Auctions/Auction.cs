@@ -21,7 +21,7 @@ namespace UAuction.Auctions
         public CachedPlayer Owner { get; }
         public TimeSpan Duration { get; }
         public ICollection<AuctionBid> Bids { get; } = new List<AuctionBid>();
-
+        public AuctionBid BestBid { get; private set; }
 
         public decimal GetBidPrice(Player player, decimal amount)
         {
@@ -33,9 +33,9 @@ namespace UAuction.Auctions
 
         }
 
-        public bool AddBid(Player player, decimal amount)
+        public bool AddBid(Player player, decimal amount, out decimal currentBid)
         {
-            if (!IsValidBid(amount, out decimal currentBid))
+            if (!IsValidBid(amount, out currentBid))
                 return false;
 
             GetBidPrice(player, amount);
@@ -44,22 +44,25 @@ namespace UAuction.Auctions
 
             if (bid == null)
             {
-                Bids.Add(new AuctionBid()
+                bid = new AuctionBid()
                 {
                     Player = new CachedPlayer(player),
                     Amount = amount
-                });
+                };
+                Bids.Add(bid);
             }
             else
             {
                 bid.Amount = amount;
             }
+
+            BestBid = bid;
             return true;
         }
 
         public bool IsValidBid(decimal amount, out decimal currentBid)
         {
-            currentBid = (Bids.FirstOrDefault()?.Amount ?? StartingBid);
+            currentBid = BestBid?.Amount ?? StartingBid;
             return amount > currentBid;
         }
 
@@ -72,7 +75,7 @@ namespace UAuction.Auctions
         {
             foreach(var bid in Bids)
             {
-                if (exceptions.Contains (bid.Player.Id))
+                if (exceptions.Contains(bid.Player.Id))
                     continue;
                 Plugin.Instance.AwardManager.RewardPlayer(bid.Player.Id, bid.Amount);
             }
