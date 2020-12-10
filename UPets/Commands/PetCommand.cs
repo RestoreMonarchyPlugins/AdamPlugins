@@ -105,6 +105,19 @@ namespace Adam.PetsPlugin
             RunAsync(() => 
             {
                 pet = pluginInstance.Database.GetPlayerPets(player.Id).FirstOrDefault(x => x.AnimalId == config.Id);
+
+                if (pet == null && player.HasPermission($"pet.own.{config.Name}"))
+                {
+                    pluginInstance.Database.AddPlayerPet(new PlayerPet()
+                    {
+                        AnimalId = config.Id,
+                        PlayerId = player.Id,
+                        PurchaseDate = DateTime.UtcNow
+                    });
+
+                    pet = pluginInstance.Database.GetPlayerPets(player.Id).FirstOrDefault(x => x.AnimalId == config.Id);
+                }
+
                 if (pet != null)
                 {
                     TaskDispatcher.QueueOnMainThread(() => 

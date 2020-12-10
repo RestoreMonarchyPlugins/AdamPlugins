@@ -21,7 +21,7 @@ namespace Adam.PetsPlugin.Helpers
             animal.pack = packInfo;
             packInfo.animals.Add(animal);
             packInfo.spawns.Add(item);
-            AnimalManager.packs.Add(packInfo);
+            //AnimalManager.packs.Add(packInfo);
             pluginInstance.AnimalManager.channel.openWrite();
             pluginInstance.AnimalManager.sendAnimal(animal);
             pluginInstance.AnimalManager.channel.closeWrite("tellAnimal", ESteamCall.OTHERS, ESteamPacket.UPDATE_RELIABLE_CHUNK_BUFFER);
