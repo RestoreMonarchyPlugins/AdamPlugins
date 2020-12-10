@@ -166,7 +166,7 @@ namespace Adam.PetsPlugin
 
         private void ShopCommand(IRocketPlayer caller)
         {
-            StringBuilder sb = new StringBuilder("PetShopAvailable");
+            StringBuilder sb = new StringBuilder(pluginInstance.Translate("PetShopAvailable"));
             foreach (var petConfig in pluginInstance.Configuration.Instance.Pets)
             {
                 if (string.IsNullOrEmpty(petConfig.Permission) || caller.IsAdmin || caller.HasPermission(petConfig.Permission))
