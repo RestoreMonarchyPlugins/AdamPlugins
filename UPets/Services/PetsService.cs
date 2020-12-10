@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Rocket.Core.Extensions;
 using UnityEngine;
 
 namespace Adam.PetsPlugin.Services
@@ -16,7 +17,10 @@ namespace Adam.PetsPlugin.Services
     public class PetsService : MonoBehaviour
     {
         private PetsPlugin pluginInstance => PetsPlugin.Instance;
-
+        
+        public event PetSpawned OnPetSpawned;
+        public event PetDespawned OnPetDespawned;
+        
         public List<PlayerPet> ActivePets { get; private set; }
 
         void Awake()
@@ -32,6 +36,12 @@ namespace Adam.PetsPlugin.Services
         void OnDestroy()
         {
             U.Events.OnPlayerDisconnected -= OnPlayerDisconnected;
+            
+            //we want to also kill all pets on shutdown
+            foreach (var pet in ActivePets.ToArray())
+            {
+                KillPet(pet);
+            }
         }
 
         private void OnPlayerDisconnected(UnturnedPlayer player)
@@ -52,16 +62,21 @@ namespace Adam.PetsPlugin.Services
             pet.Animal = AnimalsHelper.SpawnAnimal(pet.AnimalId, player.Position, (byte)player.Rotation);
             pet.Player = player.Player;
             ActivePets.Add(pet);
+            OnPetSpawned.TryInvoke(pet);
         }
 
         public void KillPet(PlayerPet pet)
         {
             AnimalsHelper.KillAnimal(pet.Animal);
             ActivePets.Remove(pet);
+            OnPetDespawned.TryInvoke(pet);
         }
 
         public bool IsPet(Animal animal) => ActivePets.Exists(x => x.Animal == animal);
         public PlayerPet GetPet(Animal animal) => ActivePets.FirstOrDefault(x => x.Animal == animal);
         public IEnumerable<PlayerPet> GetPlayerActivePets(string playerId) => ActivePets.Where(x => x.PlayerId == playerId);
     }
+
+    public delegate void PetSpawned(PlayerPet pet);
+    public delegate void PetDespawned(PlayerPet pet);
 }
