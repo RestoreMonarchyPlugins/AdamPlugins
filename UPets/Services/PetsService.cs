@@ -44,6 +44,11 @@ namespace Adam.PetsPlugin.Services
         
         public void SpawnPet(UnturnedPlayer player, PlayerPet pet)
         {
+            foreach (var activePet in GetPlayerActivePets(player.Id).ToArray())
+            {
+                KillPet(activePet);
+            }
+
             pet.Animal = AnimalsHelper.SpawnAnimal(pet.AnimalId, player.Position, (byte)player.Rotation);
             pet.Player = player.Player;
             ActivePets.Add(pet);

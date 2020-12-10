@@ -92,12 +92,11 @@ namespace Adam.PetsPlugin
             PlayerPet pet;
             if (pets != null && pets.Count() > 0)
             {
-                pet = pets.First();
+                pet = pets.FirstOrDefault(x => x.AnimalId == config.Id);
 
-                pluginInstance.PetsService.KillPet(pet);
-
-                if (pet.AnimalId == config.Id)
+                if (pet != null)
                 {
+                    pluginInstance.PetsService.KillPet(pet);
                     pluginInstance.ReplyPlayer(player, "PetDespawnSuccess", config.Name);
                     return;
                 }
@@ -108,12 +107,15 @@ namespace Adam.PetsPlugin
                 pet = pluginInstance.Database.GetPlayerPets(player.Id).FirstOrDefault(x => x.AnimalId == config.Id);
                 if (pet != null)
                 {
-                    TaskDispatcher.QueueOnMainThread(() => pluginInstance.PetsService.SpawnPet(player, pet));
-                    pluginInstance.ReplyPlayer(player, "PetSpawnSuccess", config.Name);
+                    TaskDispatcher.QueueOnMainThread(() => 
+                    {
+                        pluginInstance.PetsService.SpawnPet(player, pet);
+                        pluginInstance.ReplyPlayer(player, "PetSpawnSuccess", config.Name);
+                    });                    
                 }
                 else
                     pluginInstance.ReplyPlayer(player, "PetSpawnFail", config.Name);
-            });            
+            });
         }
 
         public void BuyCommand(UnturnedPlayer player, PetConfig config)
@@ -130,20 +132,26 @@ namespace Adam.PetsPlugin
                 return;
             }
 
-            if (UconomyHelper.GetPlayerBalance(player.Id) < config.Cost)
+            TaskDispatcher.QueueOnMainThread(() =>
             {
-                pluginInstance.ReplyPlayer(player, "PetCantAfford", config.Name, config.Cost);
-                return;
-            }
+                if (UconomyHelper.GetPlayerBalance(player.Id) < config.Cost)
+                {
+                    pluginInstance.ReplyPlayer(player, "PetCantAfford", config.Name, config.Cost);
+                    return;
+                }
 
-            UconomyHelper.IncreaseBalance(player.Id, config.Cost * -1);
-            pluginInstance.Database.AddPlayerPet(new PlayerPet()
-            {
-                AnimalId = config.Id,
-                PlayerId = player.Id,
-                PurchaseDate = DateTime.UtcNow
+                UconomyHelper.IncreaseBalance(player.Id, config.Cost * -1);
+                RunAsync(() =>
+                {
+                    pluginInstance.Database.AddPlayerPet(new PlayerPet()
+                    {
+                        AnimalId = config.Id,
+                        PlayerId = player.Id,
+                        PurchaseDate = DateTime.UtcNow
+                    });
+                });                
+                pluginInstance.ReplyPlayer(player, "PetBuySuccess", config.Name, config.Cost);
             });
-            pluginInstance.ReplyPlayer(player, "PetBuySuccess", config.Name, config.Cost);
         }
 
         private void ShopCommand(IRocketPlayer caller)
