@@ -11,6 +11,7 @@ using System;
 using Rocket.API;
 using System.Threading;
 using Rocket.Core.Utils;
+using Rocket.Core.Commands;
 
 namespace Adam.PetsPlugin
 {
@@ -99,6 +100,26 @@ namespace Adam.PetsPlugin
             { "PetBuyAlreadyHave", "You already have {0}!" },
             { "PetBuyNoPermission", "You don't have permission to buy {0}!" }
         };
+
+        [RocketCommand("pets", "Displays a list of your pets", "", AllowedCaller.Player)]
+        public void PetsCommand(IRocketPlayer caller, string[] command)
+        {
+            PetCommand.ListCommand(caller);
+        }
+
+        [RocketCommand("petshop", "Displays a list of pets in shop", "", AllowedCaller.Player)]
+        [RocketCommandAlias("petsshop")]
+        public void PetShopCommand(IRocketPlayer caller, string[] command)
+        {
+            PetCommand.ShopCommand(caller);
+        }
+
+        [RocketCommand("pethelp", "Displays a help of pet commands", "", AllowedCaller.Player)]
+        [RocketCommandAlias("petshelp")]
+        public void PetHelpCommand(IRocketPlayer caller, string[] command)
+        {
+            PetCommand.HelpCommand(caller);
+        }
     }
 }
 

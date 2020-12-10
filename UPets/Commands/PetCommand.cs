@@ -15,7 +15,7 @@ namespace Adam.PetsPlugin
 {
     public class PetCommand : IRocketCommand
     {
-        private PetsPlugin pluginInstance => PetsPlugin.Instance;
+        private static PetsPlugin pluginInstance => PetsPlugin.Instance;
 
         public void Execute(IRocketPlayer caller, string[] command)
         {
@@ -54,7 +54,7 @@ namespace Adam.PetsPlugin
             }
         }
 
-        private void RunAsync(Action action)
+        private static void RunAsync(Action action)
         {
             ThreadPool.QueueUserWorkItem((_) => 
             { 
@@ -68,7 +68,7 @@ namespace Adam.PetsPlugin
             });
         }
 
-        private bool TryGetPetConfig(IRocketPlayer caller, string value, out PetConfig config)
+        private static bool TryGetPetConfig(IRocketPlayer caller, string value, out PetConfig config)
         {
             config = null;
             if (value == null)
@@ -128,7 +128,7 @@ namespace Adam.PetsPlugin
             });
         }
 
-        public void BuyCommand(UnturnedPlayer player, PetConfig config)
+        public static void BuyCommand(UnturnedPlayer player, PetConfig config)
         {
             if (!player.HasPermission(config.Permission) && !player.IsAdmin && !string.IsNullOrEmpty(config.Permission))
             {
@@ -164,7 +164,7 @@ namespace Adam.PetsPlugin
             });
         }
 
-        private void ShopCommand(IRocketPlayer caller)
+        public static void ShopCommand(IRocketPlayer caller)
         {
             StringBuilder sb = new StringBuilder(pluginInstance.Translate("PetShopAvailable"));
             foreach (var petConfig in pluginInstance.Configuration.Instance.Pets)
@@ -181,7 +181,7 @@ namespace Adam.PetsPlugin
                 pluginInstance.ReplyPlayer(caller, sb.ToString().TrimEnd(','));
         }
 
-        private void ListCommand(IRocketPlayer caller)
+        public static void ListCommand(IRocketPlayer caller)
         {
             List<string> pets = new List<string>();
             var playerPets = pluginInstance.Database.GetPlayerPets(caller.Id);
@@ -200,7 +200,7 @@ namespace Adam.PetsPlugin
             
         }
 
-        private void HelpCommand(IRocketPlayer caller)
+        public static void HelpCommand(IRocketPlayer caller)
         {
             pluginInstance.ReplyPlayer(caller, "PetHelpLine1");
             pluginInstance.ReplyPlayer(caller, "PetHelpLine2");
