@@ -108,14 +108,11 @@ namespace Adam.PetsPlugin
 
                 if (pet == null && player.HasPermission($"pet.own.{config.Name}"))
                 {
-                    pluginInstance.Database.AddPlayerPet(new PlayerPet()
+                    pet = new PlayerPet()
                     {
                         AnimalId = config.Id,
-                        PlayerId = player.Id,
-                        PurchaseDate = DateTime.UtcNow
-                    });
-
-                    pet = pluginInstance.Database.GetPlayerPets(player.Id).FirstOrDefault(x => x.AnimalId == config.Id);
+                        PlayerId = player.Id
+                    };
                 }
 
                 if (pet != null)
@@ -186,15 +183,14 @@ namespace Adam.PetsPlugin
 
         private void ListCommand(IRocketPlayer caller)
         {
-            PetConfig petConfig;
             List<string> pets = new List<string>();
-            foreach (var pet in pluginInstance.Database.GetPlayerPets(caller.Id))
+            var playerPets = pluginInstance.Database.GetPlayerPets(caller.Id);
+            foreach (var petConfig in pluginInstance.Configuration.Instance.Pets)
             {
-                petConfig = pluginInstance.Configuration.Instance.Pets.FirstOrDefault(x => x.Id == pet.AnimalId);
-                if (petConfig != null)
+                if (playerPets.Any(x => x.AnimalId == petConfig.Id) || caller.HasPermission($"pet.own.{petConfig.Name}"))
                 {
                     pets.Add(petConfig.Name);
-                }                
+                }
             }
 
             if (pets.Count == 0)
